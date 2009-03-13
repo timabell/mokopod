@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=MokoPod
+Comment=Retrieve an listen to podcasts
+Encoding=UTF-8
+Version=0.1
+Exec=mokopod
+Icon=
+Terminal=false
+Type=Application
+Categories=Configuration
+StartupNotify=false

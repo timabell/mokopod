@@ -1,0 +1,12 @@
+Package: mokopod
+Version: 0.1.5.1
+Description: Retrieve and listen to podcasts.
+Section: openmoko/audio
+Maintainer: Esben Damgaard <ebbe@hvemder.dk>
+Architecture: armv4t
+OE: mokopod
+Homepage: http://...
+Priority: optional
+Tags: group::audio
+Depends: python-html, python-pickle, python-netclient, python-pygtk
+Source: http://...tar.gz
