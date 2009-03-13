@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Copy the script
+cp src/mokopod.py opkgfolder/bin/mokopod
+
+#Copy modules
+cp src/mokopodlib/*.py opkgfolder/usr/lib/site-python/mokopodlib/
+
+# Copy .desktop
+cp mokopod.desktop opkgfolder/usr/share/applications/
+
+# Copy control
+cp control opkgfolder/CONTROL
+
+fakeroot ./ipkg-build opkgfolder
