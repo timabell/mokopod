@@ -3,6 +3,7 @@ import gobject,gtk, os, sys
 import pickle
 import urllib # So we can download files
 from time import strftime
+from threading import Thread
 
 sys.path.append('/usr/lib/site-python')
 
@@ -15,6 +16,7 @@ from mokopodlib import playpod
 
 class gui:
   def quit(self,target):
+    gtk.main_quit(target)
     exit()
   
   def get_active_text(self, combobox):
@@ -183,6 +185,47 @@ class gui:
 
 
 class mokorss:
+  class DownloadEpisodes(Thread):
+    def __init__(self,parent):
+      Thread.__init__(self)
+      self.parent = parent
+      
+    def run(self):
+      # TODO: save shownotes
+      popupText = "Downloaded new episodes for:"
+      save_path = self.parent.getPodcastFolder()
+      if save_path=="":
+        self.parent.setFolderToSaveIn(t)
+      if not os.path.exists(save_path):
+        os.mkdir(save_path)
+      for feed in self.parent.feeds[1::]:
+        dialog = self.parent.gui.showTextNoOk("Checking "+feed['name'])
+        pod_path = save_path + feed['name'] + "/"
+        if not os.path.exists(pod_path):
+          os.mkdir(pod_path)
+        # TODO: See if feedparser is slowing Openmoko down too much
+        parser = feedparser.parse(feed['url'])
+        feed['episode_title'] = parser.entries[0].title
+        old_pubDate = feed['episode_pubDate']
+        feed['episode_pubDate'] = parser.entries[0].updated_parsed
+        dialog.destroy()
+        if feed['episode_pubDate'] > old_pubDate:
+          dialog = self.parent.gui.showTextNoOk("Downloading episode from\n"+feed['name'])
+          filename = parser.entries[0].enclosures[0].href.split('/')[-1]
+          if filename.find("?"):
+            filename = filename.split('?')[0]
+          if os.path.exists(feed['episode_path']):
+            os.remove(feed['episode_path'])
+          # TODO: Use wget?
+          urllib.urlretrieve(parser.entries[0].enclosures[0].href, pod_path+filename)
+          popupText = popupText + "\n* " + feed['name']
+          dialog.destroy()
+          feed['episode_path'] = pod_path+filename
+          feed['episode_pos'] = 0
+      self.parent.saveFeeds()
+      self.parent.showFeedInfo(self.parent.gui.feedCombo)
+      self.parent.gui.showText(popupText)
+
   def __init__(self, gui):
     self.gui = gui
     self.loadFeeds()
@@ -199,40 +242,8 @@ class mokorss:
     playpod.control(view, self.feeds[self.currentFeed], self)
   
   def getNewEpisodes(self, t):
-    # TODO: save shownotes
-    popupText = "Downloaded new episodes for:"
-    save_path = self.getPodcastFolder()
-    if save_path=="":
-      self.setFolderToSaveIn(t)
-    if not os.path.exists(save_path):
-      os.mkdir(save_path)
-    for feed in self.feeds[1::]:
-      dialog = self.gui.showTextNoOk("Checking "+feed['name'])
-      pod_path = save_path + feed['name'] + "/"
-      if not os.path.exists(pod_path):
-        os.mkdir(pod_path)
-      # TODO: See if feedparser is slowing Openmoko down too much
-      parser = feedparser.parse(feed['url'])
-      feed['episode_title'] = parser.entries[0].title
-      old_pubDate = feed['episode_pubDate']
-      feed['episode_pubDate'] = parser.entries[0].updated_parsed
-      dialog.destroy()
-      if feed['episode_pubDate'] > old_pubDate:
-        dialog = self.gui.showTextNoOk("Downloading episode from\n"+feed['name'])
-        filename = parser.entries[0].enclosures[0].href.split('/')[-1]
-        if filename.find("?"):
-          filename = filename.split('?')[0]
-        if os.path.exists(feed['episode_path']):
-          os.remove(feed['episode_path'])
-        # TODO: Use wget?
-        urllib.urlretrieve(parser.entries[0].enclosures[0].href, pod_path+filename)
-        popupText = popupText + "\n* " + feed['name']
-        dialog.destroy()
-        feed['episode_path'] = pod_path+filename
-        feed['episode_pos'] = 0
-    self.saveFeeds()
-    self.showFeedInfo(self.gui.feedCombo)
-    self.gui.showText(popupText)
+    d = self.DownloadEpisodes(self)
+    d.start()
     
   def removeCurrentFeed(self, t):
     if self.gui.yesNoDialog("Do you really want to remove\n%s?" % (self.feeds[self.currentFeed]['name'])):
@@ -327,7 +338,11 @@ class mokorss:
 
 if __name__ == "__main__":
   #os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
+  #gtk.gdk.threads_init()
+  #gtk.gdk.threads_enter()
+
   g = gui()
   app = mokorss(g)
   #start processing screen events
   g.main()
+  #gtk.gdk.threads_leave()

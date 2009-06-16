@@ -7,5 +7,5 @@ Exec=mokopod
 Icon=
 Terminal=false
 Type=Application
-Categories=Configuration
+Categories=Application
 StartupNotify=false

@@ -1,4 +1,4 @@
-import gobject,gtk, os, sys
+import gobject,gtk, os, sys, dbus
 import pymplayer, signal
 from time import strftime
 import pickle
@@ -49,6 +49,13 @@ class control:
   stateFileLoad = "/usr/share/openmoko/scenarios/stereoouthead.state"
   volumeFile = os.environ.get('HOME') + "/.mokorss/volume"
   def __init__(self, gui, feed, parent):
+    try:
+      bus = dbus.SystemBus()
+      # Tell FSO we will use CPU
+      usage_obj = bus.get_object('org.freesmartphone.ousaged', '/org/freesmartphone/Usage')
+      usage_obj.RequestResource("CPU")
+    except:
+      pass
     if os.path.exists(self.stateFileLoad):
       restorePath = os.environ.get('HOME') + "/.mokorss/restore.state"
       os.system("alsactl -f "+restorePath+" store")
@@ -132,6 +139,12 @@ class control:
     if os.path.exists(self.stateFileLoad):
       restorePath = os.environ.get('HOME') + "/.mokorss/restore.state"
       os.system("alsactl -f "+restorePath+" restore")
+    try:
+      bus = dbus.SystemBus()
+      usage_obj = bus.get_object('org.freesmartphone.ousaged', '/org/freesmartphone/Usage')
+      usage_obj.ReleaseResource("CPU")
+    except:
+      pass
     try:
       del self.gui
     except:

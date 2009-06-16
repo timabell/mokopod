@@ -1,15 +1,29 @@
 #!/bin/sh
 
+
+# Create dirs
+mkdir -p opkgfolder/usr/bin
+mkdir -p opkgfolder/usr/lib/site-python/mokopodlib/
+mkdir -p opkgfolder/usr/share/applications/
+mkdir -p opkgfolder/usr/share/pixmaps/
+
+
 # Copy the script
-cp src/mokopod.py opkgfolder/bin/mokopod
+cp src/mokopod.py opkgfolder/usr/bin/mokopod
+cp mokopod_mplayer opkgfolder/usr/bin/
 
 #Copy modules
 cp src/mokopodlib/*.py opkgfolder/usr/lib/site-python/mokopodlib/
 
 # Copy .desktop
 cp mokopod.desktop opkgfolder/usr/share/applications/
+cp mokopod.png opkgfolder/usr/share/pixmaps/
 
 # Copy control
 cp control opkgfolder/CONTROL
 
 fakeroot ./ipkg-build opkgfolder
+
+
+# Clean
+#rm -rf opkgfolder
