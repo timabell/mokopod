@@ -216,7 +216,7 @@ class mokorss:
       self.url = url
       self.parsedFeed = self.Parse(self.url)
       self.name = self.parsedFeed['feed']['title']
-      self.relativeDownloadPath = self.parsedFeed['name'] + "/"
+      self.relativeDownloadPath = self.name + "/"
 
     def Parse(self,url):
       return feedparser.parse(self.url)
@@ -393,7 +393,7 @@ class mokorss:
     for i in range(1,number):
       self.gui.feedCombo.remove_text(1)
     for feed in self.feeds[1::]:
-      self.gui.feedCombo.append_text(feed['name'])
+      self.gui.feedCombo.append_text(feed.name)
   
   def net_getFeedName(self, url):
     d = feedparser.parse(url)
