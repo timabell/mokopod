@@ -135,7 +135,7 @@ class gui:
 
   def destroyEpisodeListWindow(self,t):
     self.episodelist_window.destroy()
-  def newEpisodeListWindow(self):
+  def newEpisodeListWindow(self,  feed):
     w = gtk.Window()
     w.set_transient_for(self.w)
     w.set_modal(True)
@@ -212,12 +212,37 @@ class gui:
 
 class mokorss:
   class Feed:
-    url = ""
-    def __init__(self,  url):
+    def __init__(self,  parent,  url):
       self.url = url
+      self.parent = parent
+      self.parsedFeed = Parse(self.url)
+      self.name = self.parsedFeed['feed']['title']
+      self.relativeDownloadPath = self.parsedFeed['name'] + "/"
+
+    def Parse(self,url):
+      parsedFeed = feedparser.parse(self.url)
 
     def GetEpisodeLIst():
-      foo
+      #todo match existing entries
+      for entry in self.parsedFeed.entries:
+        episode = Episode()
+        episode.title = entry.title
+        episode.pubDate = entry.updated_parsed
+        url = entry.enclosures[0].href
+        episode.downloadUrl = url
+        #extract filename from url
+        filename = url.split('/')[-1] #last part of url
+        if filename.find("?"):
+          filename = filename.split('?')[0] #remove any querystring
+        episode.filename = filename
+        episode.status = "new"
+
+    class Episode:
+      def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
+        self.status = "downloading"
+        self.file = storagePath+self.filename
+        urllib.urlretrieve(self.downloadUrl, self.file)
+        self.status = "ready"
 
   class Storage:
     def IntializeDownloadLocation(self):
@@ -304,7 +329,8 @@ class mokorss:
     self.gui.newfeed_ok_button.connect('clicked',self.parseNewFeed)
 
   def newEpisodeListWindow(self, t):
-    self.gui.newEpisodeListWindow()
+    #feed = 
+    self.gui.newEpisodeListWindow(feed)
   
   def parseNewFeed(self,t):
     name = self.net_getFeedName(self.gui.newfeed_URL.get_text())
