@@ -218,12 +218,13 @@ class mokorss:
       foo
 
   class Storage:
-    def IntializeDownloadLocation():
+    def IntializeDownloadLocation(self):
      self.save_path = self.parent.getPodcastFolder()
      if save_path=="":
        self.parent.setFolderToSaveIn(t)
      if not os.path.exists(save_path):
        os.mkdir(save_path)
+     return save_path
 
   class DownloadEpisodes(Thread):
     def __init__(self,parent):
@@ -233,11 +234,7 @@ class mokorss:
     def run(self):
       # TODO: save shownotes
       popupText = "Downloaded new episodes for:"
-      save_path = self.parent.getPodcastFolder()
-      if save_path=="":
-        self.parent.setFolderToSaveIn(t)
-      if not os.path.exists(save_path):
-        os.mkdir(save_path)
+      save_path = self.parent.Storage().IntializeDownloadLocation()
       for feed in self.parent.feeds[1::]:
         dialog = self.parent.gui.showTextNoOk("Checking "+feed['name'])
         pod_path = save_path + feed['name'] + "/"
@@ -267,6 +264,7 @@ class mokorss:
       self.parent.gui.showText(popupText)
 
   def __init__(self, gui):
+    self.storageRoot = os.environ.get('HOME') + "/.mokorss/"
     self.gui = gui
     self.loadFeeds()
     self.redrawFeedCombo()
@@ -327,15 +325,13 @@ class mokorss:
     #cb.set_active(0)
   
   def saveFeeds(self):
-    path = os.environ.get('HOME') + "/.mokorss/"
-    filename = path + "feeds"
+    filename = self.storageRoot + "feeds"
     f = open( filename, 'w' )
     pickle.dump(self.feeds, f)
     f.close()
     
   def loadFeeds(self):
-    path = os.environ.get('HOME') + "/.mokorss/"
-    filename = path + "feeds"
+    filename = self.storageRoot + "feeds"
     # Does the file feed list exists?
     if not os.path.exists(filename):
       if not os.path.exists(path):
@@ -347,8 +343,7 @@ class mokorss:
       f.close()
   
   def getPodcastFolder(self):
-    path = os.environ.get('HOME') + "/.mokorss/"
-    filename = path + "folder"
+    filename = self.storageRoot + "folder"
     if not os.path.exists(filename):
       return ""
     else:
@@ -363,8 +358,7 @@ class mokorss:
       return self.setFolderToSaveIn(t)
     if not place[-1]=="/":
       place = place + "/"
-    path = os.environ.get('HOME') + "/.mokorss/"
-    filename = path + "folder"
+    filename = self.storageRoot + "folder"
     f = open( filename, 'w' )
     pickle.dump(place, f)
     f.close()
