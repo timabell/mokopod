@@ -133,8 +133,8 @@ class gui:
     w.show_all()
     self.newfeed_window = w
 
-  def destroyNedFeedEpisodeListWindow(self,t):
-    self.newfeed_window.destroy()
+  def destroyEpisodeListWindow(self,t):
+    self.episodelist_window.destroy()
   def newEpisodeListWindow(self):
     w = gtk.Window()
     w.set_transient_for(self.w)
@@ -144,7 +144,7 @@ class gui:
     v = gtk.VBox(False,10)   
     v.add(gtk.Label("Episode list"))
     closeButton = gtk.Button("Close")
-    closeButton.connect('clicked', self.destroyNedFeedEpisodeListWindow)
+    closeButton.connect('clicked', self.destroyEpisodeListWindow)
     v.add(closeButton)
     w.add(v)
     w.show_all()
