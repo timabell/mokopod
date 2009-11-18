@@ -28,12 +28,12 @@ class gui:
   
   def showFeed(self, feed):
     #called indirectly when item selected in feed list combo box
-    self.feedInfo_label[0].set_label("Name: " + feed['name'])
-    self.feedInfo_label[1].set_label("URL: " + feed['url'])
+    self.feedInfo_label[0].set_label("Name: " + feed.name)
+    self.feedInfo_label[1].set_label("URL: " + feed.url)
     self.feedInfo_label[2].set_label("*Latest episode*")
-    self.feedInfo_label[3].set_label("Title: " + feed['episode_title'])
-    self.feedInfo_label[4].set_label("File: " + feed['episode_path'])
-    self.feedInfo_label[5].set_label("pubDate: " + strftime("%c", feed['episode_pubDate']))
+    #self.feedInfo_label[3].set_label("Title: " + feed['episode_title']) #fixme
+    #self.feedInfo_label[4].set_label("File: " + feed['episode_path'])#fixme
+    #self.feedInfo_label[5].set_label("pubDate: " + strftime("%c", feed['episode_pubDate']))#fixme
     
     if not feed['episode_path']=="":
       self.playpodButton.set_sensitive(True)
