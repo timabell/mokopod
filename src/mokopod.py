@@ -209,6 +209,22 @@ class gui:
 
 
 class mokorss:
+  class Feed:
+    url = ""
+    def __init__(self,  url):
+      self.url = url
+
+    def GetEpisodeLIst():
+      foo
+
+  class Storage:
+    def IntializeDownloadLocation():
+     self.save_path = self.parent.getPodcastFolder()
+     if save_path=="":
+       self.parent.setFolderToSaveIn(t)
+     if not os.path.exists(save_path):
+       os.mkdir(save_path)
+
   class DownloadEpisodes(Thread):
     def __init__(self,parent):
       Thread.__init__(self)
