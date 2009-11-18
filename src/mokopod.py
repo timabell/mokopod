@@ -130,6 +130,24 @@ class gui:
     w.show_all()
     self.newfeed_window = w
 
+  def destroyNedFeedEpisodeListWindow(self,t):
+    self.newfeed_window.destroy()
+  def newEpisodeListWindow(self):
+    w = gtk.Window()
+    w.set_transient_for(self.w)
+    w.set_modal(True)
+    w.set_title("Episodes")
+    w.maximize()
+    v = gtk.VBox(False,10)   
+    v.add(gtk.Label("Episode list"))
+    closeButton = gtk.Button("Close")
+    closeButton.connect('clicked', self.destroyNedFeedEpisodeListWindow)
+    v.add(cancelButton)
+    w.add(v)
+    w.show_all()
+    self.episodelist_window = w
+    
+
   def __init__(self):
     self.w = gtk.Window()
     self.w.set_title("Moko do the RSS")
@@ -239,6 +257,7 @@ class mokorss:
     gui.configureButton.connect('clicked', self.setFolderToSaveIn)
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
     gui.getNewEpisodesButton.connect('clicked', self.getNewEpisodes)
+    gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
   
   def playPodcast(self, t):
     view = playpod.view(self.gui.w, self.feeds[self.currentFeed])
@@ -264,6 +283,9 @@ class mokorss:
   def newFeedWindow(self, t):
     self.gui.newFeedWindow()
     self.gui.newfeed_ok_button.connect('clicked',self.parseNewFeed)
+
+  def newEpisodeListWindow(self, t):
+    self.gui.newEpisodeListWindow()
   
   def parseNewFeed(self,t):
     name = self.net_getFeedName(self.gui.newfeed_URL.get_text())
