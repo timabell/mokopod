@@ -166,9 +166,12 @@ class gui:
     for i in range(0,6):
       self.feedInfo_label.append(gtk.Label(""))
       vbox.add(self.feedInfo_label[i])
-    self.playpodButton = gtk.Button("\nPlay latest episode\n")
+    self.playpodButton = gtk.Button("Play latest episode")
     self.playpodButton.set_sensitive(False)
     vbox.add(self.playpodButton)
+    self.listEpisodesButton = gtk.Button("List episodes")
+    self.listEpisodesButton.set_sensitive(False)
+    vbox.add(self.listEpisodesButton)
     self.feedInfo_removeb = gtk.Button("Remove feed")
     self.feedInfo_removeb.set_sensitive(False)
     vbox.add(self.feedInfo_removeb)
