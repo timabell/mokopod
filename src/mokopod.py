@@ -102,7 +102,7 @@ class gui:
     self.feedInfo_removeb.set_sensitive(False)
     self.playpodButton.set_sensitive(False)
     
-  def destroyNedFeedWindow(self,t):
+  def destroyNewFeedWindow(self,t):
     self.newfeed_window.destroy()
   def newFeedWindow(self):
     w = gtk.Window()
@@ -123,7 +123,7 @@ class gui:
     
     h = gtk.HBox(True,3)
     cancelButton = gtk.Button("\nCancel\n")
-    cancelButton.connect('clicked', self.destroyNedFeedWindow)
+    cancelButton.connect('clicked', self.destroyNewFeedWindow)
     h.add(cancelButton)
     self.newfeed_ok_button = gtk.Button("\nDone!\n")
     h.add(self.newfeed_ok_button)
