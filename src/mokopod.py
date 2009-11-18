@@ -143,6 +143,8 @@ class gui:
     w.maximize()
     v = gtk.VBox(False,10)   
     v.add(gtk.Label("Episode list"))
+    updateFeedButton = gtk.Button("Update feed")
+    v.add(updateFeedButton)
     closeButton = gtk.Button("Close")
     closeButton.connect('clicked', self.destroyEpisodeListWindow)
     v.add(closeButton)
