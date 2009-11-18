@@ -37,8 +37,10 @@ class gui:
     
     if not feed['episode_path']=="":
       self.playpodButton.set_sensitive(True)
+      self.listEpisodesButton.set_sensitive(True)
     else:
       self.playpodButton.set_sensitive(False)
+      self.listEpisodesButton.set_sensitive(False)
     self.feedInfo_removeb.set_sensitive(True)
   
   def yesNoDialog(self, text):
@@ -143,7 +145,7 @@ class gui:
     v.add(gtk.Label("Episode list"))
     closeButton = gtk.Button("Close")
     closeButton.connect('clicked', self.destroyNedFeedEpisodeListWindow)
-    v.add(cancelButton)
+    v.add(closeButton)
     w.add(v)
     w.show_all()
     self.episodelist_window = w
