@@ -27,6 +27,7 @@ class gui:
     return model[active][0]
   
   def showFeed(self, feed):
+    'called indirectly when item selected in feed list combo box
     self.feedInfo_label[0].set_label("Name: " + feed['name'])
     self.feedInfo_label[1].set_label("URL: " + feed['url'])
     self.feedInfo_label[2].set_label("*Latest episode*")
@@ -298,6 +299,7 @@ class mokorss:
     self.redrawFeedCombo()
     
   def showFeedInfo(self, cb):
+    'fired when item selected in feed list combo box
     active = cb.get_active()
     if active < 1:
       self.gui.clearInfoView()
