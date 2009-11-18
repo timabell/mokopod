@@ -212,15 +212,14 @@ class gui:
 
 class mokorss:
   class Feed:
-    def __init__(self,  parent,  url):
+    def __init__(self,  url):
       self.url = url
-      self.parent = parent
-      self.parsedFeed = Parse(self.url)
+      self.parsedFeed = self.Parse(self.url)
       self.name = self.parsedFeed['feed']['title']
       self.relativeDownloadPath = self.parsedFeed['name'] + "/"
 
     def Parse(self,url):
-      parsedFeed = feedparser.parse(self.url)
+      return feedparser.parse(self.url)
 
     def GetEpisodeLIst():
       #todo match existing entries
@@ -333,11 +332,9 @@ class mokorss:
     self.gui.newEpisodeListWindow(feed)
   
   def parseNewFeed(self,t):
-    name = self.net_getFeedName(self.gui.newfeed_URL.get_text())
-    new_feed = {'url': self.gui.newfeed_URL.get_text(), 'name':name,
-      'episode_path':'', 'episode_pos':0, 'episode_pubDate':(0,0,0,0,0,0,0,0,0),
-      'episode_title':''}
-    self.feeds.append(new_feed)
+    url = self.gui.newfeed_URL.get_text()
+    feed = self.Feed(url)
+    self.feeds.append(feed)
     self.gui.newfeed_window.destroy()
     self.saveFeeds()
     self.redrawFeedCombo()
@@ -362,8 +359,8 @@ class mokorss:
     filename = self.storageRoot + "feeds"
     # Does the file feed list exists?
     if not os.path.exists(filename):
-      if not os.path.exists(path):
-        os.mkdir(path)
+      if not os.path.exists(self.storageRoot):
+        os.mkdir(self.storageRoot)
       self.feeds = [0]
     else:
       f = open( filename, 'r' )
