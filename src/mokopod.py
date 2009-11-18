@@ -35,13 +35,13 @@ class gui:
     #self.feedInfo_label[4].set_label("File: " + feed['episode_path'])#fixme
     #self.feedInfo_label[5].set_label("pubDate: " + strftime("%c", feed['episode_pubDate']))#fixme
     
-    if feed.status=="ready":
-      self.playpodButton.set_sensitive(True)
-      self.listEpisodesButton.set_sensitive(True)
-    else:
-      self.playpodButton.set_sensitive(False)
-      self.listEpisodesButton.set_sensitive(False)
-    self.feedInfo_removeb.set_sensitive(True)
+#    if feed.status=="ready": #fixme
+#      self.playpodButton.set_sensitive(True)
+#      self.listEpisodesButton.set_sensitive(True)
+#    else:
+#      self.playpodButton.set_sensitive(False)
+#      self.listEpisodesButton.set_sensitive(False)
+#    self.feedInfo_removeb.set_sensitive(True)
   
   def yesNoDialog(self, text):
     dialog = gtk.MessageDialog(  
