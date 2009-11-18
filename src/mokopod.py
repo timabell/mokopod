@@ -35,7 +35,7 @@ class gui:
     #self.feedInfo_label[4].set_label("File: " + feed['episode_path'])#fixme
     #self.feedInfo_label[5].set_label("pubDate: " + strftime("%c", feed['episode_pubDate']))#fixme
     
-    if not feed['episode_path']=="":
+    if feed.status=="ready":
       self.playpodButton.set_sensitive(True)
       self.listEpisodesButton.set_sensitive(True)
     else:
@@ -259,21 +259,22 @@ class mokorss:
       
     def run(self):
       # TODO: save shownotes
+      # TODO: use new feed class
       popupText = "Downloaded new episodes for:"
       save_path = self.parent.Storage().IntializeDownloadLocation()
       for feed in self.parent.feeds[1::]:
-        dialog = self.parent.gui.showTextNoOk("Checking "+feed['name'])
-        pod_path = save_path + feed['name'] + "/"
+        dialog = self.parent.gui.showTextNoOk("Checking "+feed.name)
+        pod_path = save_path + feed.name + "/"
         if not os.path.exists(pod_path):
           os.mkdir(pod_path)
         # TODO: See if feedparser is slowing Openmoko down too much
-        parser = feedparser.parse(feed['url'])
+        parser = feedparser.parse(feed.url)
         feed['episode_title'] = parser.entries[0].title
         old_pubDate = feed['episode_pubDate']
         feed['episode_pubDate'] = parser.entries[0].updated_parsed
         dialog.destroy()
         if feed['episode_pubDate'] > old_pubDate:
-          dialog = self.parent.gui.showTextNoOk("Downloading episode from\n"+feed['name'])
+          dialog = self.parent.gui.showTextNoOk("Downloading episode from\n"+feed.name)
           filename = parser.entries[0].enclosures[0].href.split('/')[-1]
           if filename.find("?"):
             filename = filename.split('?')[0]
@@ -281,7 +282,7 @@ class mokorss:
             os.remove(feed['episode_path'])
           # TODO: Use wget?
           urllib.urlretrieve(parser.entries[0].enclosures[0].href, pod_path+filename)
-          popupText = popupText + "\n* " + feed['name']
+          popupText = popupText + "\n* " + feed.name
           dialog.destroy()
           feed['episode_path'] = pod_path+filename
           feed['episode_pos'] = 0
