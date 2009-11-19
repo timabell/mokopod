@@ -363,7 +363,7 @@ class mokorss:
     if not os.path.exists(self.feedListFile):
       self.feeds = [0]
     else:
-      f = open( filename, 'r' )
+      f = open(self.feedListFile, 'r' )
       self.feeds = pickle.load(f)
       f.close()
   
