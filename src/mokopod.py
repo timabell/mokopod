@@ -23,6 +23,7 @@ from mokopodlib import playpod
 #TODO: save shownotes
 #TODO: update the episode list after get/delete
 #TODO: any kind of error handling and notification. eg out of disk space, connection failures
+#TODO: opml import/export
 
 class gui:
   def quit(self,target):
