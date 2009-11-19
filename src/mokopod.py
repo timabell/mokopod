@@ -186,19 +186,13 @@ class gui:
     
     # Add topbar with buttons
     hbox = gtk.HBox(True,10)
-    vbox = gtk.VBox(True,10)
-    self.configureButton = gtk.Button("Configure")
-    vbox.add(self.configureButton)
-    self.getNewEpisodesButton = gtk.Button("Get new episodes")
-    vbox.add(self.getNewEpisodesButton)
-    hbox.add(vbox)
-    vbox = gtk.VBox(True,10)
-    self.newFeedButton = gtk.Button("Add new podcast")
-    vbox.add(self.newFeedButton)
-    closeButton = gtk.Button("Close program")
+    self.configureButton = gtk.Button("Download config")
+    hbox.add(self.configureButton)
+    self.newFeedButton = gtk.Button("Add podcast...")
+    hbox.add(self.newFeedButton)
+    closeButton = gtk.Button("Close mokopod")
     closeButton.connect('clicked', gtk.main_quit)
-    vbox.add(closeButton)
-    hbox.add(vbox)
+    hbox.add(closeButton)
     mainvbox.add(hbox)
     
     # Add list of current feeds
@@ -212,6 +206,8 @@ class gui:
     for i in range(0,6):
       self.feedInfo_label.append(gtk.Label(""))
       vbox.add(self.feedInfo_label[i])
+    self.getNewEpisodesButton = gtk.Button("Get latest episode")
+    vbox.add(self.getNewEpisodesButton)
     self.playpodButton = gtk.Button("Play latest episode")
     self.playpodButton.set_sensitive(False)
     vbox.add(self.playpodButton)
