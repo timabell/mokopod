@@ -394,7 +394,7 @@ class Feed:
     self.parsedFeed = self.Parse(self.url)
     self.name = self.parsedFeed['feed']['title']
     self.relativeDownloadPath = self.name + "/"
-    self.episodes=[0]
+    self.episodes=[]
     self.EnumerateEpisodes()
 
   def Parse(self,url):
