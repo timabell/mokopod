@@ -283,6 +283,7 @@ class mokorss:
     if not os.path.exists(self.storageRoot):
       os.mkdir(self.storageRoot)
     self.feedListFile = self.storageRoot + "feedlist"
+    self.downloadFolderFile = self.storageRoot + "downloadfolder"
     self.gui = gui
     self.loadFeeds()
     self.redrawFeedCombo()
@@ -309,12 +310,13 @@ class mokorss:
     d.start()
     
   def removeCurrentFeed(self, t):
-    if self.gui.yesNoDialog("Do you really want to remove\n%s?" % (self.feeds[self.currentFeed]['name'])):
+    if self.gui.yesNoDialog("Do you really want to remove\n%s?" % (self.feeds[self.currentFeed].name)):
       # Remove files
-      if os.path.exists(self.feeds[self.currentFeed]['episode_path']):
-        os.remove(self.feeds[self.currentFeed]['episode_path'])
-      if os.path.exists(self.getPodcastFolder() + self.feeds[self.currentFeed]['name']):
-        os.rmdir(self.getPodcastFolder() + self.feeds[self.currentFeed]['name'])
+      folder=self.getPodcastFolder()+self.feeds[self.currentFeed].relativeDownloadPath
+      if os.path.exists(folder):
+        os.remove(folder)
+      if os.path.exists(folder):
+        os.rmdir(folder)
       # Remove the rest
       self.gui.clearInfoView()
       self.feeds.remove(self.feeds[self.currentFeed])
@@ -371,11 +373,10 @@ class mokorss:
       f.close()
   
   def getPodcastFolder(self):
-    filename = self.storageRoot + "folder"
-    if not os.path.exists(filename):
-      return self.storageRoot + "/downloads/"
+    if not os.path.exists(self.downloadFolderFile):
+      return self.storageRoot + "downloads/"
     else:
-      f = open( filename, 'r' )
+      f = open( self.downloadFolderFile, 'r' )
       place = pickle.load(f)
       f.close()
       return place
@@ -386,8 +387,7 @@ class mokorss:
       return
     if not place[-1]=="/":
       place = place + "/"
-    filename = self.storageRoot + "folder"
-    f = open( filename, 'w' )
+    f = open( self.downloadFolderFile, 'w' )
     pickle.dump(place, f)
     f.close()
   
