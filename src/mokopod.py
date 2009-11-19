@@ -2,6 +2,7 @@
 import gobject,gtk, os, sys
 import pickle
 import urllib # So we can download files
+import shutil
 from time import strftime
 from threading import Thread
 
@@ -219,7 +220,7 @@ class gui:
     self.listEpisodesButton = gtk.Button("List episodes")
     self.listEpisodesButton.set_sensitive(False)
     vbox.add(self.listEpisodesButton)
-    self.feedInfo_removeb = gtk.Button("Remove feed")
+    self.feedInfo_removeb = gtk.Button("Remove feed and files")
     self.feedInfo_removeb.set_sensitive(False)
     vbox.add(self.feedInfo_removeb)
     mainvbox.add(vbox)
@@ -314,9 +315,7 @@ class mokorss:
       # Remove files
       folder=self.getPodcastFolder()+self.feeds[self.currentFeed].relativeDownloadPath
       if os.path.exists(folder):
-        os.remove(folder)
-      if os.path.exists(folder):
-        os.rmdir(folder)
+        shutil.rmtree(folder) #remove episode files and folder
       # Remove the rest
       self.gui.clearInfoView()
       self.feeds.remove(self.feeds[self.currentFeed])
