@@ -211,38 +211,6 @@ class gui:
 
 
 class mokorss:
-  class Feed:
-    def __init__(self,  url):
-      self.url = url
-      self.parsedFeed = self.Parse(self.url)
-      self.name = self.parsedFeed['feed']['title']
-      self.relativeDownloadPath = self.name + "/"
-
-    def Parse(self,url):
-      return feedparser.parse(self.url)
-
-    def GetEpisodeLIst():
-      #todo match existing entries
-      for entry in self.parsedFeed.entries:
-        episode = Episode()
-        episode.title = entry.title
-        episode.pubDate = entry.updated_parsed
-        url = entry.enclosures[0].href
-        episode.downloadUrl = url
-        #extract filename from url
-        filename = url.split('/')[-1] #last part of url
-        if filename.find("?"):
-          filename = filename.split('?')[0] #remove any querystring
-        episode.filename = filename
-        episode.status = "new"
-
-    class Episode:
-      def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
-        self.status = "downloading"
-        self.file = storagePath+self.filename
-        urllib.urlretrieve(self.downloadUrl, self.file)
-        self.status = "ready"
-
   class Storage:
     def IntializeDownloadLocation(self):
      self.save_path = self.parent.getPodcastFolder()
@@ -399,6 +367,37 @@ class mokorss:
     d = feedparser.parse(url)
     return d['feed']['title']
 
+class Feed:
+  def __init__(self,  url):
+    self.url = url
+    self.parsedFeed = self.Parse(self.url)
+    self.name = self.parsedFeed['feed']['title']
+    self.relativeDownloadPath = self.name + "/"
+
+  def Parse(self,url):
+    return feedparser.parse(self.url)
+
+  def GetEpisodeLIst():
+    #todo match existing entries
+    for entry in self.parsedFeed.entries:
+      episode = Episode()
+      episode.title = entry.title
+      episode.pubDate = entry.updated_parsed
+      url = entry.enclosures[0].href
+      episode.downloadUrl = url
+      #extract filename from url
+      filename = url.split('/')[-1] #last part of url
+      if filename.find("?"):
+        filename = filename.split('?')[0] #remove any querystring
+      episode.filename = filename
+      episode.status = "new"
+
+  class Episode:
+    def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
+      self.status = "downloading"
+      self.file = storagePath+self.filename
+      urllib.urlretrieve(self.downloadUrl, self.file)
+      self.status = "ready"
 
 if __name__ == "__main__":
   #os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
