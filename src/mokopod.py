@@ -24,6 +24,7 @@ from mokopodlib import playpod
 #TODO: update the episode list after get/delete
 #TODO: any kind of error handling and notification. eg out of disk space, connection failures
 #TODO: opml import/export
+#TODO: prevent duplication of feeds
 
 class gui:
   def quit(self,target):
@@ -129,11 +130,11 @@ class gui:
     w.maximize()
     v = gtk.VBox(False,10)
     
-    v.add(gtk.Label("Add new feed"))
+    v.add(gtk.Label("Add new feed(s) - separate urls with spaces"))
     
     h = gtk.HBox(False,3)
     
-    h.add(gtk.Label("URL for feed:"))
+    h.add(gtk.Label("URL(s) for feed(s):"))
     self.newfeed_URL = gtk.Entry()
     h.add(self.newfeed_URL)
     v.add(h)
@@ -200,7 +201,7 @@ class gui:
     hbox = gtk.HBox(True,10)
     self.configureButton = gtk.Button("Download config")
     hbox.add(self.configureButton)
-    self.newFeedButton = gtk.Button("Add podcast...")
+    self.newFeedButton = gtk.Button("Add podcasts...")
     hbox.add(self.newFeedButton)
     closeButton = gtk.Button("Close mokopod")
     closeButton.connect('clicked', gtk.main_quit)
@@ -303,7 +304,7 @@ class mokorss:
     
   def newFeedWindow(self, t):
     self.gui.newFeedWindow()
-    self.gui.newfeed_ok_button.connect('clicked',self.parseNewFeed)
+    self.gui.newfeed_ok_button.connect('clicked',self.parseNewFeeds)
 
   def newEpisodeListWindow(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
@@ -319,8 +320,15 @@ class mokorss:
     feed.Update()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
 
-  def parseNewFeed(self,t):
-    url = self.gui.newfeed_URL.get_text()
+  def parseNewFeeds(self,  t):
+    text = self.gui.newfeed_URL.get_text()
+    if text.find(" ") != -1: #multiple urls separated by spaces
+      for url in text.split(" "):
+        self.parseNewFeed(url)
+      return
+    self.parseNewFeed(text)
+
+  def parseNewFeed(self,  url):
     feed = Feed(url)
     self.feeds.append(feed)
     self.gui.newfeed_window.destroy()
