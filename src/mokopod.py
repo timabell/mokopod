@@ -428,12 +428,16 @@ class Feed:
         filename = filename.split('?')[0] #remove any querystring
       episode.filename = filename
       episode.status = "new"
+      episode.parentFeed=self
       self.episodes.append(episode);
 
 class Episode:
   def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
     self.status = "downloading"
-    self.file = storagePath+self.filename
+    folder=storagePath+self.parentFeed.relativeDownloadPath
+    if not os.path.exists(folder):
+      os.mkdir(folder)
+    self.file = folder+self.filename
     urllib.urlretrieve(self.downloadUrl, self.file)
     self.status = "ready"
     self.position = 0 #where the user stopped playing this episode
