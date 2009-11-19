@@ -154,7 +154,7 @@ class gui:
       text = gtk.Label(episode.status + ", " + episode.title)
       item.add(text)
       downloadButton = gtk.Button("get")
-      downloadButton.connect('clicked',  lambda selectedEpisode=episode : downloadCallback(selectedEpisode))
+      downloadButton.connect('clicked',  lambda t,  selectedEpisode=episode: downloadCallback(selectedEpisode))
       item.add(downloadButton)
       playButton = gtk.Button("play")
       item.add(playButton)
@@ -329,7 +329,7 @@ class mokorss:
 
   def downloadCallback(self, episode):
     self.IntializeDownloadLocation()
-    episode.Download(save_path)
+    episode.Download(self.save_path)
 
   def updateFeed(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
