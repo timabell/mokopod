@@ -407,7 +407,7 @@ class Feed:
   def EnumerateEpisodes(self):
     #todo match existing entries
     for entry in self.parsedFeed.entries:
-      episode = self.Episode()
+      episode = Episode()
       episode.title = entry.title
       episode.pubDate = entry.updated_parsed
       url = entry.enclosures[0].href
