@@ -416,12 +416,12 @@ class Feed:
       episode.status = "new"
       self.episodes.append(episode);
 
-  class Episode:
-    def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
-      self.status = "downloading"
-      self.file = storagePath+self.filename
-      urllib.urlretrieve(self.downloadUrl, self.file)
-      self.status = "ready"
+class Episode:
+  def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
+    self.status = "downloading"
+    self.file = storagePath+self.filename
+    urllib.urlretrieve(self.downloadUrl, self.file)
+    self.status = "ready"
 
 if __name__ == "__main__":
   #os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
