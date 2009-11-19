@@ -143,7 +143,7 @@ class gui:
     w.set_title("Episodes")
     w.maximize()
     v = gtk.VBox(False,10)   
-    v.add(gtk.Label("Episode list"))
+    v.add(gtk.Label(feed.name))
     updateFeedButton = gtk.Button("Update feed")
     v.add(updateFeedButton)
     closeButton = gtk.Button("Close")
@@ -301,7 +301,7 @@ class mokorss:
     self.gui.newfeed_ok_button.connect('clicked',self.parseNewFeed)
 
   def newEpisodeListWindow(self, t):
-    #feed = 
+    feed = self.feeds[self.gui.feedCombo.get_active()]
     self.gui.newEpisodeListWindow(feed)
   
   def parseNewFeed(self,t):
