@@ -289,7 +289,7 @@ class mokorss:
     self.loadFeeds()
     self.redrawFeedCombo()
     gui.feedCombo.connect("changed", self.showFeedInfo)
-    gui.playpodButton.connect('clicked', self.playPodcast)
+    gui.playpodButton.connect('clicked', self.playLatestEpisode)
     gui.newFeedButton.connect('clicked', self.newFeedWindow)
     gui.configureButton.connect('clicked', self.setFolderToSaveIn)
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
@@ -297,9 +297,13 @@ class mokorss:
     gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
     gui.updateFeedButton.connect('clicked', self.updateFeed)
   
-  def playPodcast(self, t):
-    view = playpod.view(self.gui.w, self.feeds[self.currentFeed])
-    playpod.control(view, self.feeds[self.currentFeed], self)
+  def playLatestEpisode(self, t):
+    feed = self.feeds[self.gui.feedCombo.get_active()]
+    view = playpod.view(self.gui.w, feed.episodes[0],  feed.name)
+    playpod.control(view, feed.episodes[0], self)
+  
+  def playEpisode(self,  episode):
+    foo #todo
   
   def getNewEpisodes(self, t):
     d = self.DownloadEpisodes(self)
@@ -431,6 +435,7 @@ class Episode:
     self.file = storagePath+self.filename
     urllib.urlretrieve(self.downloadUrl, self.file)
     self.status = "ready"
+    self.position = 0 #where the user stopped playing this episode
 
 if __name__ == "__main__":
   #os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))

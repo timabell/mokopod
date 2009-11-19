@@ -4,7 +4,7 @@ from time import strftime
 import pickle
 
 class view:
-  def __init__(self, parent_window, feed):
+  def __init__(self, parent_window, episode,  feedName):
     self.w = gtk.Window()
     self.w.set_transient_for(parent_window)
     self.w.set_modal(True)
@@ -15,9 +15,9 @@ class view:
     
     # Main page
     mainvbox = gtk.VBox(False, 10)
-    mainvbox.add(gtk.Label(feed['name']))
-    mainvbox.add(gtk.Label(feed['episode_title']))
-    mainvbox.add(gtk.Label(strftime("%c", feed['episode_pubDate'])))
+    mainvbox.add(gtk.Label(feedName))
+    mainvbox.add(gtk.Label(episode.title))
+    mainvbox.add(gtk.Label(strftime("%c", episode.pubDate)))
     
     self.positionLabel = gtk.Label("")
     mainvbox.add(self.positionLabel)
@@ -48,7 +48,7 @@ class view:
 class control:
   stateFileLoad = "/usr/share/openmoko/scenarios/stereoouthead.state"
   volumeFile = os.environ.get('HOME') + "/.mokorss/volume"
-  def __init__(self, gui, feed, parent):
+  def __init__(self, gui, episode, parent):
     try:
       bus = dbus.SystemBus()
       # Tell FSO we will use CPU
@@ -76,18 +76,18 @@ class control:
     gui.forwardButton30.connect('clicked', self.goForward, 30.0)
     self.running = True
     self.gui = gui
-    self.feed = feed
+    self.episode = episode
     self.parent = parent
     
     def handle_data(data):
       pass
     
     self.player = pymplayer.MPlayer()
-    self.player.args = [feed['episode_path']]
+    self.player.args = [episode.file]
     self.player.stdout.attach(handle_data)
     self.player.start()
     self.player.command('volume', volume, 1)
-    self.player.command('seek', feed['episode_pos'], 2)
+    self.player.command('seek', episode.position, 2)
     signal.signal(signal.SIGTERM, lambda s, f: player.quit())
     signal.signal(signal.SIGINT, lambda s, f: player.quit())
     
@@ -120,9 +120,9 @@ class control:
         return
       pos = int(pos)
       if pos < 5:
-        self.feed['episode_pos'] = 0
+        self.episode.position = 0
       else:
-        self.feed['episode_pos'] = pos - 5
+        self.episode.position = pos - 5
       length = int(self.player.query('get_time_length'))
       pos = "%d:%02d / %d:%02d" % (int(pos/60), (pos % 60), int(length/60), (length % 60))
       self.gui.positionLabel.set_text(str(pos))
