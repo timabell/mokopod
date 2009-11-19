@@ -30,19 +30,19 @@ class gui:
     #called indirectly when item selected in feed list combo box
     self.feedInfo_label[0].set_label("Name: " + feed.name)
     self.feedInfo_label[1].set_label("URL: " + feed.url)
-    self.feedInfo_label[2].set_label("*Latest episode*")
     self.listEpisodesButton.set_sensitive(True)
     self.updateFeedButton.set_sensitive(True)
-    #self.feedInfo_label[3].set_label("Title: " + feed['episode_title']) #fixme
-    #self.feedInfo_label[4].set_label("File: " + feed['episode_path'])#fixme
-    #self.feedInfo_label[5].set_label("pubDate: " + strftime("%c", feed['episode_pubDate']))#fixme
-    
-#    if feed.status=="ready": #fixme
-#      self.playpodButton.set_sensitive(True)
-#    else:
-#      self.playpodButton.set_sensitive(False)
-#      self.listEpisodesButton.set_sensitive(False)
-#    self.feedInfo_removeb.set_sensitive(True)
+    self.feedInfo_removeb.set_sensitive(True)
+    if feed.episodes:
+      latest = feed.episodes[0]
+      self.feedInfo_label[2].set_label("*Latest episode* - %s" % latest.status)
+      self.feedInfo_label[3].set_label("Title: " + latest.title)
+      self.feedInfo_label[4].set_label("File: " + latest.filename)
+      self.feedInfo_label[5].set_label("Date: " + strftime("%c",latest.pubDate))
+      if latest.status=="ready":
+        self.playpodButton.set_sensitive(True)
+      else:
+        self.playpodButton.set_sensitive(False)
   
   def yesNoDialog(self, text):
     dialog = gtk.MessageDialog(  
@@ -104,6 +104,7 @@ class gui:
     self.playpodButton.set_sensitive(False)
     self.listEpisodesButton.set_sensitive(False)
     self.updateFeedButton.set_sensitive(False)
+    self.feedInfo_removeb.set_sensitive(False)
 
   def destroyNewFeedWindow(self,t):
     self.newfeed_window.destroy()
