@@ -139,7 +139,7 @@ class gui:
 
   def destroyEpisodeListWindow(self,t):
     self.episodelist_window.destroy()
-  def newEpisodeListWindow(self,  feed, downloadCallback):
+  def newEpisodeListWindow(self,  feed, downloadCallback,  playCallback):
     w = gtk.Window()
     w.set_transient_for(self.w)
     w.set_modal(True)
@@ -157,6 +157,7 @@ class gui:
       downloadButton.connect('clicked',  lambda t,  selectedEpisode=episode: downloadCallback(selectedEpisode))
       item.add(downloadButton)
       playButton = gtk.Button("play")
+      playButton.connect('clicked',  lambda t,  selectedEpisode=episode: playCallback(selectedEpisode))
       item.add(playButton)
       deleteButton = gtk.Button("delete")
       item.add(deleteButton)
@@ -300,7 +301,8 @@ class mokorss:
     playpod.control(view, feed.episodes[0], self)
   
   def playEpisode(self,  episode):
-    foo #todo
+    view = playpod.view(self.gui.w, episode,  "fixme - feed title here")
+    playpod.control(view, episode, self)
   
   def getNewEpisodes(self, t):
     d = self.DownloadEpisodes(self)
@@ -325,11 +327,12 @@ class mokorss:
 
   def newEpisodeListWindow(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
-    self.gui.newEpisodeListWindow(feed, self.downloadCallback)
+    self.gui.newEpisodeListWindow(feed, self.downloadEpisode,  self.playEpisode)
 
-  def downloadCallback(self, episode):
+  def downloadEpisode(self, episode):
     self.IntializeDownloadLocation()
     episode.Download(self.save_path)
+    self.saveFeeds() #to save the new state of this episode
 
   def updateFeed(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
