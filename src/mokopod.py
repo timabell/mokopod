@@ -14,6 +14,14 @@ from mokopodlib import playpod
 # Requirements on Openmoko: (not complete)
 # python-html, python-pickle, python-netclient, mplayer, python-pygtk
 
+#TODO: playlist
+#TODO: separate adding feed url from download and parse of xml
+#TODO: background long running operations
+#TODO: download progress indicator
+#TODO: ability to cancel long running operations
+#TODO: continue partial downloads
+#TODO: save shownotes
+#TODO: update the episode list after get/delete
 
 class gui:
   def quit(self,target):
@@ -34,6 +42,7 @@ class gui:
     self.listEpisodesButton.set_sensitive(True)
     self.updateFeedButton.set_sensitive(True)
     self.feedInfo_removeb.set_sensitive(True)
+    self.getLatestEpisodeButton.set_sensitive(True)
     if feed.episodes:
       latest = feed.episodes[0]
       self.feedInfo_label[2].set_label("*Latest episode* - %s" % latest.status)
@@ -106,6 +115,7 @@ class gui:
     self.listEpisodesButton.set_sensitive(False)
     self.updateFeedButton.set_sensitive(False)
     self.feedInfo_removeb.set_sensitive(False)
+    self.getLatestEpisodeButton.set_sensitive(False)
 
   def destroyNewFeedWindow(self,t):
     self.newfeed_window.destroy()
@@ -206,8 +216,9 @@ class gui:
     for i in range(0,6):
       self.feedInfo_label.append(gtk.Label(""))
       vbox.add(self.feedInfo_label[i])
-    self.getNewEpisodesButton = gtk.Button("Get latest episode")
-    vbox.add(self.getNewEpisodesButton)
+    self.getLatestEpisodeButton = gtk.Button("Get latest episode")
+    self.getLatestEpisodeButton.set_sensitive(False)
+    vbox.add(self.getLatestEpisodeButton)
     self.playpodButton = gtk.Button("Play latest episode")
     self.playpodButton.set_sensitive(False)
     vbox.add(self.playpodButton)
@@ -238,44 +249,6 @@ class mokorss:
    if not os.path.exists(self.save_path):
      os.mkdir(self.save_path)
 
-  class DownloadEpisodes(Thread):
-    def __init__(self,parent):
-      Thread.__init__(self)
-      self.parent = parent
-      
-    def run(self):
-      # TODO: save shownotes
-      # TODO: use new feed class
-      popupText = "Downloaded new episodes for:"
-      self.IntializeDownloadLocation()
-      for feed in self.parent.feeds[1::]:
-        dialog = self.parent.gui.showTextNoOk("Checking "+feed.name)
-        pod_path = save_path + feed.name + "/"
-        if not os.path.exists(pod_path):
-          os.mkdir(pod_path)
-        # TODO: See if feedparser is slowing Openmoko down too much
-        parser = feedparser.parse(feed.url)
-        feed['episode_title'] = parser.entries[0].title
-        old_pubDate = feed['episode_pubDate']
-        feed['episode_pubDate'] = parser.entries[0].updated_parsed
-        dialog.destroy()
-        if feed['episode_pubDate'] > old_pubDate:
-          dialog = self.parent.gui.showTextNoOk("Downloading episode from\n"+feed.name)
-          filename = parser.entries[0].enclosures[0].href.split('/')[-1]
-          if filename.find("?"):
-            filename = filename.split('?')[0]
-          if os.path.exists(feed['episode_path']):
-            os.remove(feed['episode_path'])
-          # TODO: Use wget?
-          urllib.urlretrieve(parser.entries[0].enclosures[0].href, pod_path+filename)
-          popupText = popupText + "\n* " + feed.name
-          dialog.destroy()
-          feed['episode_path'] = pod_path+filename
-          feed['episode_pos'] = 0
-      self.parent.saveFeeds()
-      self.parent.showFeedInfo(self.parent.gui.feedCombo)
-      self.parent.gui.showText(popupText)
-
   def __init__(self, gui):
     self.storageRoot = os.environ.get('HOME') + "/.mokorss/"
     if not os.path.exists(self.storageRoot):
@@ -290,7 +263,7 @@ class mokorss:
     gui.newFeedButton.connect('clicked', self.newFeedWindow)
     gui.configureButton.connect('clicked', self.setFolderToSaveIn)
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
-    gui.getNewEpisodesButton.connect('clicked', self.getNewEpisodes)
+    gui.getLatestEpisodeButton.connect('clicked', self.getLatestEpisode)
     gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
     gui.updateFeedButton.connect('clicked', self.updateFeed)
   
@@ -305,13 +278,15 @@ class mokorss:
 
   def deleteEpisode(self, episode):
     if self.gui.yesNoDialog("Really delete episode?\n%s" % (episode.title)):
-      os.remove(episode.file)
+      if os.path.exists(episode.file):
+        os.remove(episode.file)
       episode.status="deleted"
+      self.saveFeeds() #to save the new state of this episode
 
-  def getNewEpisodes(self, t):
-    d = self.DownloadEpisodes(self)
-    d.start()
-    
+  def getLatestEpisode(self, t):
+    self.downloadEpisode(self.feeds[self.currentFeed].episodes[0])
+    self.gui.showFeed() #update displayed feed info, and enable play button
+
   def removeCurrentFeed(self, t):
     if self.gui.yesNoDialog("Do you really want to remove\n%s?" % (self.feeds[self.currentFeed].name)):
       # Remove files
@@ -340,6 +315,7 @@ class mokorss:
   def updateFeed(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
     feed.Update()
+    self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
 
   def parseNewFeed(self,t):
     url = self.gui.newfeed_URL.get_text()
