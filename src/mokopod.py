@@ -139,7 +139,7 @@ class gui:
 
   def destroyEpisodeListWindow(self,t):
     self.episodelist_window.destroy()
-  def newEpisodeListWindow(self,  feed):
+  def newEpisodeListWindow(self,  feed, downloadCallback):
     w = gtk.Window()
     w.set_transient_for(self.w)
     w.set_modal(True)
@@ -154,6 +154,7 @@ class gui:
       text = gtk.Label(episode.status + ", " + episode.title)
       item.add(text)
       downloadButton = gtk.Button("get")
+      downloadButton.connect('clicked',  lambda selectedEpisode=episode : downloadCallback(selectedEpisode))
       item.add(downloadButton)
       playButton = gtk.Button("play")
       item.add(playButton)
@@ -233,14 +234,10 @@ class gui:
 
 
 class mokorss:
-  class Storage:
-    def IntializeDownloadLocation(self):
-     self.save_path = self.parent.getPodcastFolder()
-     if save_path=="":
-       self.parent.setFolderToSaveIn(t)
-     if not os.path.exists(save_path):
-       os.mkdir(save_path)
-     return save_path
+  def IntializeDownloadLocation(self):
+   self.save_path = self.getPodcastFolder()
+   if not os.path.exists(self.save_path):
+     os.mkdir(self.save_path)
 
   class DownloadEpisodes(Thread):
     def __init__(self,parent):
@@ -251,7 +248,7 @@ class mokorss:
       # TODO: save shownotes
       # TODO: use new feed class
       popupText = "Downloaded new episodes for:"
-      save_path = self.parent.Storage().IntializeDownloadLocation()
+      self.IntializeDownloadLocation()
       for feed in self.parent.feeds[1::]:
         dialog = self.parent.gui.showTextNoOk("Checking "+feed.name)
         pod_path = save_path + feed.name + "/"
@@ -328,7 +325,11 @@ class mokorss:
 
   def newEpisodeListWindow(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
-    self.gui.newEpisodeListWindow(feed)
+    self.gui.newEpisodeListWindow(feed, self.downloadCallback)
+
+  def downloadCallback(self, episode):
+    self.IntializeDownloadLocation()
+    episode.Download(save_path)
 
   def updateFeed(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
@@ -369,17 +370,17 @@ class mokorss:
   def getPodcastFolder(self):
     filename = self.storageRoot + "folder"
     if not os.path.exists(filename):
-      return ""
+      return self.storageRoot + "/downloads/"
     else:
       f = open( filename, 'r' )
       place = pickle.load(f)
       f.close()
       return place
   
-  def setFolderToSaveIn(self,t):
+  def setFolderToSaveIn(self, t):
     place = self.gui.getText("Where do you want to save the podcasts?", self.getPodcastFolder())
     if len(place)==0:
-      return self.setFolderToSaveIn(t)
+      return
     if not place[-1]=="/":
       place = place + "/"
     filename = self.storageRoot + "folder"
