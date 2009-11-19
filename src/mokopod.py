@@ -292,6 +292,9 @@ class mokorss:
 
   def __init__(self, gui):
     self.storageRoot = os.environ.get('HOME') + "/.mokorss/"
+    if not os.path.exists(self.storageRoot):
+      os.mkdir(self.storageRoot)
+    self.feedListFile = self.storageRoot + "feedlist"
     self.gui = gui
     self.loadFeeds()
     self.redrawFeedCombo()
@@ -351,17 +354,13 @@ class mokorss:
     #cb.set_active(0)
   
   def saveFeeds(self):
-    filename = self.storageRoot + "feeds"
-    f = open( filename, 'w' )
+    f = open(self.feedListFile, 'w' )
     pickle.dump(self.feeds, f)
     f.close()
     
   def loadFeeds(self):
-    filename = self.storageRoot + "feeds"
     # Does the file feed list exists?
-    if not os.path.exists(filename):
-      if not os.path.exists(self.storageRoot):
-        os.mkdir(self.storageRoot)
+    if not os.path.exists(self.feedListFile):
       self.feeds = [0]
     else:
       f = open( filename, 'r' )
