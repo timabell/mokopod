@@ -305,7 +305,7 @@ class mokorss:
   
   def parseNewFeed(self,t):
     url = self.gui.newfeed_URL.get_text()
-    feed = self.Feed(url)
+    feed = Feed(url)
     self.feeds.append(feed)
     self.gui.newfeed_window.destroy()
     self.saveFeeds()
