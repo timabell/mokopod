@@ -360,7 +360,7 @@ class mokorss:
     f = open(self.feedListFile, 'w' )
     pickle.dump(self.feeds, f)
     f.close()
-    
+
   def loadFeeds(self):
     # Does the file feed list exists?
     if not os.path.exists(self.feedListFile):
@@ -405,13 +405,13 @@ class mokorss:
 class Feed:
   def __init__(self,  url):
     self.url = url
+    self.episodes=[]
     self.Update()
 
   def Update(self):
     self.parsedFeed = self.Parse(self.url)
     self.name = self.parsedFeed['feed']['title']
     self.relativeDownloadPath = self.name + "/"
-    self.episodes=[]
     self.EnumerateEpisodes()
 
   def Parse(self,url):
@@ -420,7 +420,10 @@ class Feed:
   def EnumerateEpisodes(self):
     #todo match existing entries
     for entry in self.parsedFeed.entries:
+      if self.FindEpisodeById(entry.id):
+        return #ignore already seen item
       episode = Episode()
+      episode.id = entry.id #unique id for this episode
       episode.title = entry.title
       episode.pubDate = entry.updated_parsed
       url = entry.enclosures[0].href
@@ -433,6 +436,11 @@ class Feed:
       episode.status = "new"
       episode.parentFeed=self
       self.episodes.append(episode);
+
+  def FindEpisodeById(self, id):
+    for episode in self.episodes:
+      if episode.id==id:
+        return episode
 
 class Episode:
   def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
