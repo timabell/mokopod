@@ -67,6 +67,7 @@ class control:
       gui.scroll.set_value(volume)
     else:
       gui.scroll.set_value(100)
+      volume=100
     gui.stopButton.connect('clicked', self.stop)
     gui.w.connect("destroy", self.quit)
     gui.scroll.connect('value-changed', self.changeVolume)
