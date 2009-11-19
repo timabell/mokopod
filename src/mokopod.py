@@ -32,6 +32,7 @@ class gui:
     self.feedInfo_label[1].set_label("URL: " + feed.url)
     self.feedInfo_label[2].set_label("*Latest episode*")
     self.listEpisodesButton.set_sensitive(True)
+    self.updateFeedButton.set_sensitive(True)
     #self.feedInfo_label[3].set_label("Title: " + feed['episode_title']) #fixme
     #self.feedInfo_label[4].set_label("File: " + feed['episode_path'])#fixme
     #self.feedInfo_label[5].set_label("pubDate: " + strftime("%c", feed['episode_pubDate']))#fixme
@@ -102,6 +103,7 @@ class gui:
     self.feedInfo_removeb.set_sensitive(False)
     self.playpodButton.set_sensitive(False)
     self.listEpisodesButton.set_sensitive(False)
+    self.updateFeedButton.set_sensitive(False)
 
   def destroyNewFeedWindow(self,t):
     self.newfeed_window.destroy()
@@ -144,8 +146,15 @@ class gui:
     w.maximize()
     v = gtk.VBox(False,10)   
     v.add(gtk.Label(feed.name))
-    updateFeedButton = gtk.Button("Update feed")
-    v.add(updateFeedButton)
+    list = gtk.VBox(False,3) 
+    for episode in feed.episodes:
+      item = gtk.HBox(False, 5)
+      text = gtk.Label(episode.title)
+      item.add(text)
+      viewButton = gtk.Button("view")
+      item.add(viewButton)
+      list.add(item)
+    v.add(list)
     closeButton = gtk.Button("Close")
     closeButton.connect('clicked', self.destroyEpisodeListWindow)
     v.add(closeButton)
@@ -193,6 +202,9 @@ class gui:
     self.playpodButton = gtk.Button("Play latest episode")
     self.playpodButton.set_sensitive(False)
     vbox.add(self.playpodButton)
+    self.updateFeedButton = gtk.Button("Update selected feed")
+    self.updateFeedButton.set_sensitive(False)
+    vbox.add(self.updateFeedButton)
     self.listEpisodesButton = gtk.Button("List episodes")
     self.listEpisodesButton.set_sensitive(False)
     vbox.add(self.listEpisodesButton)
@@ -274,6 +286,7 @@ class mokorss:
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
     gui.getNewEpisodesButton.connect('clicked', self.getNewEpisodes)
     gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
+    gui.updateFeedButton.connect('clicked', self.updateFeed)
   
   def playPodcast(self, t):
     view = playpod.view(self.gui.w, self.feeds[self.currentFeed])
@@ -303,7 +316,11 @@ class mokorss:
   def newEpisodeListWindow(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
     self.gui.newEpisodeListWindow(feed)
-  
+
+  def updateFeed(self, t):
+    feed = self.feeds[self.gui.feedCombo.get_active()]
+    feed.Update()
+
   def parseNewFeed(self,t):
     url = self.gui.newfeed_URL.get_text()
     feed = Feed(url)
@@ -311,7 +328,7 @@ class mokorss:
     self.gui.newfeed_window.destroy()
     self.saveFeeds()
     self.redrawFeedCombo()
-    
+
   def showFeedInfo(self, cb):
     #fired when item selected in feed list combo box
     active = cb.get_active()
@@ -371,17 +388,22 @@ class mokorss:
 class Feed:
   def __init__(self,  url):
     self.url = url
+    self.Update()
+
+  def Update(self):
     self.parsedFeed = self.Parse(self.url)
     self.name = self.parsedFeed['feed']['title']
     self.relativeDownloadPath = self.name + "/"
+    self.episodes=[0]
+    self.EnumerateEpisodes()
 
   def Parse(self,url):
     return feedparser.parse(self.url)
 
-  def GetEpisodeLIst():
+  def EnumerateEpisodes(self):
     #todo match existing entries
     for entry in self.parsedFeed.entries:
-      episode = Episode()
+      episode = self.Episode()
       episode.title = entry.title
       episode.pubDate = entry.updated_parsed
       url = entry.enclosures[0].href
@@ -392,6 +414,7 @@ class Feed:
         filename = filename.split('?')[0] #remove any querystring
       episode.filename = filename
       episode.status = "new"
+      self.episodes.append(episode);
 
   class Episode:
     def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
