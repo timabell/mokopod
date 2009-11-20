@@ -203,10 +203,12 @@ class gui:
     mainvbox = gtk.VBox(False, 10)
     
     # Add topbar with buttons
-    hbox = gtk.HBox(True,10)
+    hbox = gtk.HBox(False,10)
     self.configureButton = gtk.Button("Settings...")
     hbox.add(self.configureButton)
-    self.newFeedButton = gtk.Button("Add podcasts...")
+    self.updateAllButton = gtk.Button("Update all")
+    hbox.add(self.updateAllButton)
+    self.newFeedButton = gtk.Button("Add...")
     hbox.add(self.newFeedButton)
     mainvbox.add(hbox)
     
@@ -263,6 +265,7 @@ class mokorss:
     gui.playpodButton.connect('clicked', self.playLatestEpisode)
     gui.newFeedButton.connect('clicked', self.newFeedWindow)
     gui.configureButton.connect('clicked', self.setFolderToSaveIn)
+    gui.updateAllButton.connect('clicked',  self.updateAll)
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
     gui.getLatestEpisodeButton.connect('clicked', self.getLatestEpisode)
     gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
@@ -313,6 +316,13 @@ class mokorss:
     episode.Download(self.save_path)
     self.saveFeeds() #to save the new state of this episode
 
+  def updateAll(self, t):
+    for feed in self.feeds:
+      feed.Update()
+    self.saveFeeds()
+    self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
+    self.redrawFeedCombo()
+
   def updateFeed(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
     feed.Update()
@@ -347,7 +357,7 @@ class mokorss:
   def loadFeeds(self):
     # Does the file feed list exists?
     if not os.path.exists(self.feedListFile):
-      self.feeds = [0]
+      self.feeds = []
     else:
       f = open(self.feedListFile, 'r' )
       self.feeds = pickle.load(f)
