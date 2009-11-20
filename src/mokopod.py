@@ -336,18 +336,24 @@ class mokorss:
     self.gui.showText("downloaded")
 
   def updateAll(self, t):
+    waitWindow=self.gui.busyWindow("updating...")
     for feed in self.feeds:
       feed.Update()
     self.saveFeeds()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
     self.redrawFeedCombo()
+    waitWindow.destroy()
+    self.gui.showText("updated")
 
   def updateFeed(self, t):
+    waitWindow=self.gui.busyWindow("updating...")
     feed = self.feeds[self.gui.feedCombo.get_active()]
     feed.Update()
     self.saveFeeds()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
     self.redrawFeedCombo()
+    waitWindow.destroy()
+    self.gui.showText("updated")
 
   def addNewFeeds(self,  t):
     text = self.gui.newfeed_URL.get_text()
