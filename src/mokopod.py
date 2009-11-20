@@ -203,9 +203,6 @@ class gui:
     hbox.add(self.configureButton)
     self.newFeedButton = gtk.Button("Add podcasts...")
     hbox.add(self.newFeedButton)
-    closeButton = gtk.Button("Close mokopod")
-    closeButton.connect('clicked', gtk.main_quit)
-    hbox.add(closeButton)
     mainvbox.add(hbox)
     
     # Add list of current feeds
