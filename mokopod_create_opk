@@ -20,10 +20,11 @@ cp mokopod.desktop opkgfolder/usr/share/applications/
 cp mokopod.png opkgfolder/usr/share/pixmaps/
 
 # Copy control
+mkdir opkgfolder/CONTROL
 cp control opkgfolder/CONTROL
 
 fakeroot ./ipkg-build opkgfolder
 
 
 # Clean
-#rm -rf opkgfolder
+rm -rf opkgfolder
