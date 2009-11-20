@@ -333,6 +333,7 @@ class mokorss:
     episode.Download(self.save_path)
     self.saveFeeds() #to save the new state of this episode
     waitWindow.destroy()
+    self.gui.showText("downloaded")
 
   def updateAll(self, t):
     for feed in self.feeds:
