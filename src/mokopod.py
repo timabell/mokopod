@@ -45,17 +45,12 @@ class gui:
     self.listEpisodesButton.set_sensitive(True)
     self.updateFeedButton.set_sensitive(True)
     self.feedInfo_removeb.set_sensitive(True)
-    self.getLatestEpisodeButton.set_sensitive(True)
     if feed.episodes:
       latest = feed.episodes[0]
       self.feedInfo_label[2].set_label("*Latest episode* - %s" % latest.status)
       self.feedInfo_label[3].set_label("Title: " + latest.title)
       self.feedInfo_label[4].set_label("File: " + latest.filename)
       self.feedInfo_label[5].set_label("Date: " + strftime("%c",latest.pubDate))
-      if latest.status=="ready":
-        self.playpodButton.set_sensitive(True)
-      else:
-        self.playpodButton.set_sensitive(False)
   
   def yesNoDialog(self, text):
     dialog = gtk.MessageDialog(  
@@ -216,7 +211,6 @@ class gui:
   def createFrontPage(self):
     # Main page
     mainvbox = gtk.VBox(False, 10)
-    
     # Add topbar with buttons
     hbox = gtk.HBox(False,10)
     self.configureButton = gtk.Button("Settings...")
@@ -225,34 +219,29 @@ class gui:
     hbox.add(self.updateAllButton)
     self.newFeedButton = gtk.Button("Add...")
     hbox.add(self.newFeedButton)
-    mainvbox.add(hbox)
-    
+    mainvbox.pack_start(hbox, False, False, 0)
     # Add list of current feeds
     self.feedCombo = gtk.combo_box_new_text()
     self.feedCombo.append_text("List of feeds:")
     self.feedCombo.set_active(0)
-    mainvbox.add(self.feedCombo)
-    
+    mainvbox.pack_start(self.feedCombo, False, False, 0)
+    #feed info
     vbox = gtk.VBox(False, 1)
     self.feedInfo_label = []
     for i in range(0,6):
       self.feedInfo_label.append(gtk.Label(""))
-      vbox.add(self.feedInfo_label[i])
-    self.getLatestEpisodeButton = gtk.Button("Get latest episode")
-    self.getLatestEpisodeButton.set_sensitive(False)
-    vbox.add(self.getLatestEpisodeButton)
-    self.playpodButton = gtk.Button("Play latest episode")
-    self.playpodButton.set_sensitive(False)
-    vbox.add(self.playpodButton)
-    self.updateFeedButton = gtk.Button("Update selected feed")
+      vbox.pack_start(self.feedInfo_label[i], False, False, 0)
+    hbox = gtk.HBox(True,  5)
+    self.updateFeedButton = gtk.Button("Update feed")
     self.updateFeedButton.set_sensitive(False)
-    vbox.add(self.updateFeedButton)
-    self.listEpisodesButton = gtk.Button("List episodes")
+    hbox.add(self.updateFeedButton)
+    self.listEpisodesButton = gtk.Button("Episodes...")
     self.listEpisodesButton.set_sensitive(False)
-    vbox.add(self.listEpisodesButton)
+    hbox.add(self.listEpisodesButton)
+    vbox.pack_start(hbox, True, True, 0)
     self.feedInfo_removeb = gtk.Button("Remove feed and files")
     self.feedInfo_removeb.set_sensitive(False)
-    vbox.add(self.feedInfo_removeb)
+    vbox.pack_end(self.feedInfo_removeb, False, False, 0)
     mainvbox.add(vbox)
     return mainvbox
 
@@ -277,12 +266,10 @@ class mokorss:
     self.loadFeeds()
     self.redrawFeedCombo()
     gui.feedCombo.connect("changed", self.showFeedInfo)
-    gui.playpodButton.connect('clicked', self.playLatestEpisode)
     gui.newFeedButton.connect('clicked', self.newFeedWindow)
     gui.configureButton.connect('clicked', self.setFolderToSaveIn)
     gui.updateAllButton.connect('clicked',  self.updateAll)
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
-    gui.getLatestEpisodeButton.connect('clicked', self.getLatestEpisode)
     gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
     gui.updateFeedButton.connect('clicked', self.updateFeed)
   
