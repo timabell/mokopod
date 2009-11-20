@@ -161,7 +161,6 @@ class gui:
     v.add(gtk.Label(message))
     w.add(v)
     w.show_all()
-    self.busyWindow=w
     while gtk.events_pending():
       gtk.main_iteration(False)
     return w
