@@ -316,6 +316,7 @@ class mokorss:
   def updateFeed(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
     feed.Update()
+    self.saveFeeds()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
 
   def parseNewFeeds(self,  t):
