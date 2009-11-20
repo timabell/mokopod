@@ -302,7 +302,7 @@ class mokorss:
     
   def newFeedWindow(self, t):
     self.gui.newFeedWindow()
-    self.gui.newfeed_ok_button.connect('clicked',self.parseNewFeeds)
+    self.gui.newfeed_ok_button.connect('clicked',self.addNewFeeds)
 
   def newEpisodeListWindow(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
@@ -318,19 +318,14 @@ class mokorss:
     feed.Update()
     self.saveFeeds()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
+    self.redrawFeedCombo()
 
-  def parseNewFeeds(self,  t):
+  def addNewFeeds(self,  t):
     text = self.gui.newfeed_URL.get_text()
-    if text.find(" ") != -1: #multiple urls separated by spaces
-      for url in text.split(" "):
-        self.parseNewFeed(url)
-      return
-    self.parseNewFeed(text)
-
-  def parseNewFeed(self,  url):
-    feed = Feed(url)
-    self.feeds.append(feed)
     self.gui.newfeed_window.destroy()
+    for url in text.split(" "): #multiple urls separated by spaces (works for single url too)
+      if url!="":
+        self.feeds.append(Feed(url))
     self.saveFeeds()
     self.redrawFeedCombo()
 
@@ -378,11 +373,13 @@ class mokorss:
     f.close()
   
   def redrawFeedCombo(self):
+    selected=self.gui.feedCombo.get_active()
     number = len(self.gui.feedCombo.get_model())
     for i in range(1,number):
       self.gui.feedCombo.remove_text(1)
     for feed in self.feeds[1::]:
       self.gui.feedCombo.append_text(feed.name)
+    self.gui.feedCombo.set_active(selected)
   
   def net_getFeedName(self, url):
     d = feedparser.parse(url)
@@ -391,8 +388,8 @@ class mokorss:
 class Feed:
   def __init__(self,  url):
     self.url = url
+    self.name = url # temporary name till first update
     self.episodes=[]
-    self.Update()
 
   def Update(self):
     parsedFeed = self.Parse(self.url)
