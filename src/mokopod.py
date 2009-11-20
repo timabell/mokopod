@@ -151,14 +151,8 @@ class gui:
     w.show_all()
     self.newfeed_window = w
 
-  def destroyEpisodeListWindow(self,t):
-    self.episodelist_window.destroy()
-  def newEpisodeListWindow(self,  feed, downloadCallback,  playCallback,  deleteCallback):
-    w = gtk.Window()
-    w.set_transient_for(self.w)
-    w.set_modal(True)
-    w.set_title("Episodes")
-    w.maximize()
+  def showEpisodeList(self,  feed, downloadCallback,  playCallback,  deleteCallback):
+    self.clearWindow()
     v = gtk.VBox(False,10)   
     v.add(gtk.Label(feed.name))
     v.add(gtk.Label("%s items" % len(feed.episodes)))
@@ -182,18 +176,29 @@ class gui:
     listScroller.add_with_viewport(list)
     v.add(listScroller)
     closeButton = gtk.Button("Close")
-    closeButton.connect('clicked', self.destroyEpisodeListWindow)
+    closeButton.connect('clicked', self.showFrontPage)
     v.add(closeButton)
-    w.add(v)
-    w.show_all()
-    self.episodelist_window = w
-    
+    self.w.add(v)
+    self.w.show_all() #refresh display
 
   def __init__(self):
     self.w = gtk.Window()
     self.w.set_title("Moko do the RSS")
     self.w.connect("destroy", gtk.main_quit) # Makes gtk stop when the window is closed
-    
+    self.frontPageVBox = self.createFrontPage()
+    self.showFrontPage(None)
+
+  def clearWindow(self):
+    #remove everything from the main window before displaying a different screen
+    for x in self.w:
+      self.w.remove(x)
+
+  def showFrontPage(self, t):
+    self.clearWindow()
+    self.w.add(self.frontPageVBox)
+    self.w.show_all()
+
+  def createFrontPage(self):
     # Main page
     mainvbox = gtk.VBox(False, 10)
     
@@ -232,12 +237,8 @@ class gui:
     self.feedInfo_removeb.set_sensitive(False)
     vbox.add(self.feedInfo_removeb)
     mainvbox.add(vbox)
-    
-    self.w.add(mainvbox)
-    #b = gtk.Button('Sure?')
-    #b.connect('clicked', self.quit)
-    #noteb.append_page(b, gtk.Label("\n    Exit    \n"))
-    
+    return mainvbox
+
   def main(self):
     self.w.show_all()
     gtk.main()
@@ -305,7 +306,7 @@ class mokorss:
 
   def newEpisodeListWindow(self, t):
     feed = self.feeds[self.gui.feedCombo.get_active()]
-    self.gui.newEpisodeListWindow(feed, self.downloadEpisode,  self.playEpisode,  self.deleteEpisode)
+    self.gui.showEpisodeList(feed, self.downloadEpisode,  self.playEpisode,  self.deleteEpisode)
 
   def downloadEpisode(self, episode):
     self.IntializeDownloadLocation()
