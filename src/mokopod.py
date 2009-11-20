@@ -151,6 +151,21 @@ class gui:
     w.show_all()
     self.newfeed_window = w
 
+  def busyWindow(self, message):
+    w = gtk.Window()
+    w.set_transient_for(self.w)
+    w.set_modal(True)
+    w.set_title("Busy...")
+    w.maximize()
+    v=gtk.HBox(False, 0)
+    v.add(gtk.Label(message))
+    w.add(v)
+    w.show_all()
+    self.busyWindow=w
+    while gtk.events_pending():
+      gtk.main_iteration(False)
+    return w
+
   def showEpisodeList(self,  feed, downloadCallback,  playCallback,  deleteCallback):
     self.clearWindow()
     v = gtk.VBox(False,10)   
@@ -313,9 +328,11 @@ class mokorss:
     self.gui.showEpisodeList(feed, self.downloadEpisode,  self.playEpisode,  self.deleteEpisode)
 
   def downloadEpisode(self, episode):
+    waitWindow=self.gui.busyWindow("downloading...")
     self.IntializeDownloadLocation()
     episode.Download(self.save_path)
     self.saveFeeds() #to save the new state of this episode
+    waitWindow.destroy()
 
   def updateAll(self, t):
     for feed in self.feeds:
