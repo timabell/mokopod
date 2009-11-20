@@ -199,7 +199,7 @@ class gui:
     
     # Add topbar with buttons
     hbox = gtk.HBox(True,10)
-    self.configureButton = gtk.Button("Download config")
+    self.configureButton = gtk.Button("Settings...")
     hbox.add(self.configureButton)
     self.newFeedButton = gtk.Button("Add podcasts...")
     hbox.add(self.newFeedButton)
