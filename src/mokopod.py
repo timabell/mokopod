@@ -178,7 +178,7 @@ class gui:
       item.add(deleteButton)
       list.add(item)
     listScroller = gtk.ScrolledWindow() 
-    listScroller.set_policy(gtk.POLICY_NEVER,  gtk.POLICY_AUTOMATIC)
+    listScroller.set_policy(gtk.POLICY_AUTOMATIC,  gtk.POLICY_AUTOMATIC)
     listScroller.add_with_viewport(list)
     v.add(listScroller)
     closeButton = gtk.Button("Close")
