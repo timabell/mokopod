@@ -395,17 +395,17 @@ class Feed:
     self.Update()
 
   def Update(self):
-    self.parsedFeed = self.Parse(self.url)
-    self.name = self.parsedFeed['feed']['title']
+    parsedFeed = self.Parse(self.url)
+    self.name = parsedFeed['feed']['title']
     self.relativeDownloadPath = self.name + "/"
-    self.EnumerateEpisodes()
+    self.EnumerateEpisodes(parsedFeed)
 
   def Parse(self,url):
     return feedparser.parse(self.url)
 
-  def EnumerateEpisodes(self):
+  def EnumerateEpisodes(self, parsedFeed):
     #todo match existing entries
-    for entry in self.parsedFeed.entries:
+    for entry in parsedFeed.entries:
       if self.FindEpisodeById(entry.id):
         return #ignore already seen item
       episode = Episode()
