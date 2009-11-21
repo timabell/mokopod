@@ -116,7 +116,6 @@ class gui:
     self.listEpisodesButton.set_sensitive(False)
     self.updateFeedButton.set_sensitive(False)
     self.feedInfo_removeb.set_sensitive(False)
-    self.getLatestEpisodeButton.set_sensitive(False)
 
   def destroyNewFeedWindow(self,t):
     self.newfeed_window.destroy()
