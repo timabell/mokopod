@@ -113,7 +113,6 @@ class gui:
     for i in range(0,6):
       self.feedInfo_label[i].set_label("")
     self.feedInfo_removeb.set_sensitive(False)
-    self.playpodButton.set_sensitive(False)
     self.listEpisodesButton.set_sensitive(False)
     self.updateFeedButton.set_sensitive(False)
     self.feedInfo_removeb.set_sensitive(False)
