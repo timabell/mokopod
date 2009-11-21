@@ -255,14 +255,20 @@ class gui:
 
 class mokorss:
   def IntializeDownloadLocation(self):
-   self.save_path = self.getPodcastFolder()
-   if not os.path.exists(self.save_path):
-     os.mkdir(self.save_path)
+    self.save_path = self.getPodcastFolder()
+    try:
+      if not os.path.exists(self.save_path):
+        os.mkdir(self.save_path)
+    except BaseException, err:
+      self.gui.showText("IntializeDownloadLocation failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def __init__(self, gui):
     self.storageRoot = os.environ.get('HOME') + "/.mokorss/"
-    if not os.path.exists(self.storageRoot):
-      os.mkdir(self.storageRoot)
+    try:
+      if not os.path.exists(self.storageRoot):
+        os.mkdir(self.storageRoot)
+    except BaseException, err:
+      self.gui.showText("failed to create storage root!\n'%s'\n%s\n%s" %  (self.storageRoot, err.__class__.__name__,  err.args))
     self.feedListFile = self.storageRoot + "feedlist"
     self.downloadFolderFile = self.storageRoot + "downloadfolder"
     self.gui = gui
@@ -287,8 +293,12 @@ class mokorss:
 
   def deleteEpisode(self, episode):
     if self.gui.yesNoDialog("Really delete episode?\n%s" % (episode.title)):
-      if os.path.exists(episode.file):
-        os.remove(episode.file)
+      try:
+        if os.path.exists(episode.file):
+          os.remove(episode.file)
+      except BaseException, err:
+        self.gui.showText("deleteEpisode failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+        return
       episode.status="deleted"
       self.saveFeeds() #to save the new state of this episode
 
@@ -300,8 +310,12 @@ class mokorss:
     if self.gui.yesNoDialog("Do you really want to remove\n%s?" % (self.feeds[self.currentFeed].name)):
       # Remove files
       folder=self.getPodcastFolder()+self.feeds[self.currentFeed].relativeDownloadPath
-      if os.path.exists(folder):
-        shutil.rmtree(folder) #remove episode files and folder
+      try:
+        if os.path.exists(folder):
+          shutil.rmtree(folder) #remove episode files and folder
+      except BaseException, err:
+        self.gui.showText("removeCurrentFeed failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+        return
       # Remove the rest
       self.gui.clearInfoView()
       self.feeds.remove(self.feeds[self.currentFeed])
@@ -318,21 +332,26 @@ class mokorss:
 
   def downloadEpisode(self, episode):
     waitWindow=self.gui.busyWindow("downloading...")
+    self.IntializeDownloadLocation()
     try:
-      self.IntializeDownloadLocation()
       episode.Download(self.save_path)
-      self.saveFeeds() #to save the new state of this episode
-      waitWindow.destroy()
     except BaseException, err:
       waitWindow.destroy()
       self.gui.showText("download failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
-    else:
-      self.gui.showText("downloaded")
+      return
+    self.saveFeeds() #to save the new state of this episode
+    waitWindow.destroy()
+    self.gui.showText("downloaded")
 
   def updateAll(self, t):
     waitWindow=self.gui.busyWindow("updating...")
-    for feed in self.feeds:
-      feed.Update()
+    try:
+      for feed in self.feeds:
+        feed.Update()
+    except BaseException, err:
+      waitWindow.destroy()
+      self.gui.showText("update failed!\nfeed:%s\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      return
     self.saveFeeds()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
     self.redrawFeedCombo()
@@ -342,7 +361,12 @@ class mokorss:
   def updateFeed(self, t):
     waitWindow=self.gui.busyWindow("updating...")
     feed = self.feeds[self.gui.feedCombo.get_active()]
-    feed.Update()
+    try:
+      feed.Update()
+    except BaseException, err:
+      waitWindow.destroy()
+      self.gui.showText("update failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      return
     self.saveFeeds()
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
     self.redrawFeedCombo()
@@ -369,27 +393,35 @@ class mokorss:
     #cb.set_active(0)
   
   def saveFeeds(self):
-    f = open(self.feedListFile, 'w' )
-    pickle.dump(self.feeds, f)
-    f.close()
+    try:
+      f = open(self.feedListFile, 'w' )
+      pickle.dump(self.feeds, f)
+      f.close()
+    except BaseException, err:
+      self.gui.showText("saveFeeds failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def loadFeeds(self):
-    # Does the file feed list exists?
-    if not os.path.exists(self.feedListFile):
-      self.feeds = []
-    else:
-      f = open(self.feedListFile, 'r' )
-      self.feeds = pickle.load(f)
-      f.close()
+    try:
+      if not os.path.exists(self.feedListFile): # Does the file feed list exists?
+        self.feeds = []
+      else:
+        f = open(self.feedListFile, 'r' )
+        self.feeds = pickle.load(f)
+        f.close()
+    except BaseException, err:
+      self.gui.showText("loadFeeds failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
   
   def getPodcastFolder(self):
-    if not os.path.exists(self.downloadFolderFile):
-      return self.storageRoot + "downloads/"
-    else:
-      f = open( self.downloadFolderFile, 'r' )
-      place = pickle.load(f)
-      f.close()
-      return place
+    try:
+      if not os.path.exists(self.downloadFolderFile):
+        return self.storageRoot + "downloads/"
+      else:
+        f = open( self.downloadFolderFile, 'r' )
+        place = pickle.load(f)
+        f.close()
+        return place
+    except BaseException, err:
+      self.gui.showText("getPodcastFolder failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
   
   def setFolderToSaveIn(self, t):
     place = self.gui.getText("Where do you want to save the podcasts?", self.getPodcastFolder())
@@ -397,10 +429,13 @@ class mokorss:
       return
     if not place[-1]=="/":
       place = place + "/"
-    f = open( self.downloadFolderFile, 'w' )
-    pickle.dump(place, f)
-    f.close()
-  
+    try:
+      f = open( self.downloadFolderFile, 'w' )
+      pickle.dump(place, f)
+      f.close()
+    except BaseException, err:
+      self.gui.showText("failed to save storage config!\n'%s'\n%s\n%s" %  (self.downloadFolderFile, err.__class__.__name__,  err.args))
+
   def redrawFeedCombo(self):
     selected=self.gui.feedCombo.get_active()
     number = len(self.gui.feedCombo.get_model())
