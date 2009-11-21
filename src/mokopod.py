@@ -287,8 +287,12 @@ class mokorss:
     playpod.control(view, feed.episodes[0], self)
   
   def playEpisode(self,  episode):
-    view = playpod.view(self.gui.w, episode,  "fixme - feed title here")
-    playpod.control(view, episode, self)
+    try:
+      view = playpod.view(self.gui.w, episode,  "fixme - feed title here")
+      playpod.control(view, episode, self)
+    except BaseException, err:
+      view.w.destroy()
+      self.gui.showText("playEpisode failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def deleteEpisode(self, episode):
     if self.gui.yesNoDialog("Really delete episode?\n%s" % (episode.title)):
