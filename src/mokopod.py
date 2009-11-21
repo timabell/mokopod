@@ -319,11 +319,16 @@ class mokorss:
 
   def downloadEpisode(self, episode):
     waitWindow=self.gui.busyWindow("downloading...")
-    self.IntializeDownloadLocation()
-    episode.Download(self.save_path)
-    self.saveFeeds() #to save the new state of this episode
-    waitWindow.destroy()
-    self.gui.showText("downloaded")
+    try:
+      self.IntializeDownloadLocation()
+      episode.Download(self.save_path)
+      self.saveFeeds() #to save the new state of this episode
+      waitWindow.destroy()
+    except BaseException, err:
+      waitWindow.destroy()
+      self.gui.showText("download failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+    else:
+      self.gui.showText("downloaded")
 
   def updateAll(self, t):
     waitWindow=self.gui.busyWindow("updating...")
