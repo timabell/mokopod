@@ -30,18 +30,6 @@ from mokopodlib import playpod
 # Requirements on Openmoko: (not complete)
 # python-html, python-pickle, python-netclient, mplayer, python-pygtk
 
-#TODO: playlist
-#TODO: separate adding feed url from download and parse of xml
-#TODO: background long running operations
-#TODO: download progress indicator
-#TODO: ability to cancel long running operations
-#TODO: continue partial downloads
-#TODO: save shownotes
-#TODO: update the episode list after get/delete
-#TODO: any kind of error handling and notification. eg out of disk space, connection failures
-#TODO: opml import/export
-#TODO: prevent duplication of feeds
-
 class gui:
   def quit(self,target):
     gtk.main_quit(target)
