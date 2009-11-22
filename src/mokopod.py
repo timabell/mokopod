@@ -468,7 +468,15 @@ class Feed:
     return feedparser.parse(self.url)
 
   def EnumerateEpisodes(self, parsedFeed):
-    #todo match existing entries
+    #run through backwards, feeds are usually supplied with new entries first, 
+    #and we would have to create our final list newest first.
+    #Eg. previous feed provided episodes feb, mar, april, (oldest to newest) 
+    #which would have been supplied in reverse order as april, mar, feb (newest to oldest), 
+    #we would already have this stored as (april, mar, feb)
+    #we update and get supplied june, may, april (one existing, two new, newest first)
+    #processing in reverse order - april is matched, may is prepended to existing list, 
+    #june is prepended to existing list, giving us the desired list of june, may, april, mar, feb, ready for display in the episode list.
+    parsedFeed.entries.reverse() #sort list to be oldest to newest
     for entry in parsedFeed.entries:
       existing = self.FindEpisodeById(entry.id)
       if existing:
@@ -487,7 +495,7 @@ class Feed:
       episode.filename = filename
       episode.status = "newest"
       episode.parentFeed=self
-      self.episodes.append(episode);
+      self.episodes.insert(0, episode); #prepend
 
   def FindEpisodeById(self, id):
     for episode in self.episodes:
