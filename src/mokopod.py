@@ -470,7 +470,9 @@ class Feed:
   def EnumerateEpisodes(self, parsedFeed):
     #todo match existing entries
     for entry in parsedFeed.entries:
-      if self.FindEpisodeById(entry.id):
+      existing = self.FindEpisodeById(entry.id)
+      if existing:
+        existing.status="new" #no longer newest item
         return #ignore already seen item
       episode = Episode()
       episode.id = entry.id #unique id for this episode
@@ -483,7 +485,7 @@ class Feed:
       if filename.find("?"):
         filename = filename.split('?')[0] #remove any querystring
       episode.filename = filename
-      episode.status = "new"
+      episode.status = "newest"
       episode.parentFeed=self
       self.episodes.append(episode);
 
@@ -493,6 +495,11 @@ class Feed:
         return episode
 
 class Episode:
+  # possible episode states:
+  # newest - added in last feed update, not downloaded yet
+  # new - no longer newest (ie, the feed has been read since the first time this was seen), not downloaded yet
+  # ready - audio file downloaded and ready to play
+  # deleted - audio file deleted (i.e. user no longer interested in this episode), still displayed in episode list
   def Download(self, storagePath): #storagePath is the folder that contains all downloads (without the feed name)
     self.status = "downloading"
     folder=storagePath+self.parentFeed.relativeDownloadPath
