@@ -140,10 +140,10 @@ class control:
       else:
         self.episode.position = pos - 5
       length = int(self.player.query('get_time_length'))
-      pos = "%d:%02d / %d:%02d" % (int(pos/60), (pos % 60), int(length/60), (length % 60))
-      self.gui.positionLabel.set_text(str(pos))
+      posStr = "%d:%02d / %d:%02d" % (int(pos/60), (pos % 60), int(length/60), (length % 60))
+      self.gui.positionLabel.set_text(posStr)
       print "saving position as %i" % pos
-      parent.savePosition(episode,  pos)
+      self.parent.savePosition(self.episode,  pos)
   
   def stop(self, t):
     self.gui.w.destroy()

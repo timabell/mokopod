@@ -288,8 +288,8 @@ class mokorss:
       view = playpod.view(self.gui.w, episode)
       playpod.control(view, episode, self)
     except BaseException, err:
-      view.w.destroy()
       self.gui.showText("playEpisode failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      raise
 
   def getPosition(self,  episode):
     try:
@@ -302,16 +302,16 @@ class mokorss:
         f.close()
         return int(line)
     except BaseException, err:
-      self.gui.showText("failed to load playback position!\n%s\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      self.gui.showText("failed to load playback position!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def savePosition(self,  episode,  position):
     try:
       positionFile=self.save_path + episode.parentFeed.relativeDownloadPath + episode.filename + '.position'
       f = open(positionFile, 'w' )
-      f.write(position)
+      f.write(str(position))
       f.close()
     except BaseException, err:
-      self.gui.showText("failed to save playback position!\n%s\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      self.gui.showText("failed to save playback position!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def deleteEpisode(self, episode):
     if self.gui.yesNoDialog("Really delete episode?\n%s" % (episode.title)):
