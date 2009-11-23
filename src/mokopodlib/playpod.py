@@ -20,9 +20,8 @@ import pickle
 class view:
   def __init__(self, parent_window, episode):
     self.w = gtk.Window()
-    self.w.set_transient_for(parent_window)
     self.w.set_modal(True)
-    self.w.set_title("Moko play the podcast")
+    self.w.set_title("Playing podcast...")
     #self.w.set_decorated(False)
     #self.w.set_geometry_hints(None, 1000, 1000)
     self.w.maximize()
@@ -53,7 +52,7 @@ class view:
     hbox.add(self.forwardButton30)
     mainvbox.add(hbox)
     
-    self.stopButton = gtk.Button("\nStop\n(Position will be saved)")
+    self.stopButton = gtk.Button("Stop")
     mainvbox.add(self.stopButton)
     
     self.w.add(mainvbox)
