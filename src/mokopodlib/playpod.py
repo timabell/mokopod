@@ -18,7 +18,7 @@ from time import strftime
 import pickle
 
 class view:
-  def __init__(self, parent_window, episode,  feedName):
+  def __init__(self, parent_window, episode):
     self.w = gtk.Window()
     self.w.set_transient_for(parent_window)
     self.w.set_modal(True)
@@ -29,7 +29,7 @@ class view:
     
     # Main page
     mainvbox = gtk.VBox(False, 10)
-    mainvbox.add(gtk.Label(feedName))
+    mainvbox.add(gtk.Label(episode.parentFeed.name))
     mainvbox.add(gtk.Label(episode.title))
     mainvbox.add(gtk.Label(strftime("%c", episode.pubDate)))
     
@@ -141,6 +141,8 @@ class control:
       length = int(self.player.query('get_time_length'))
       pos = "%d:%02d / %d:%02d" % (int(pos/60), (pos % 60), int(length/60), (length % 60))
       self.gui.positionLabel.set_text(str(pos))
+      print "saving position as %i" % pos
+      parent.savePosition(episode,  pos)
   
   def stop(self, t):
     self.gui.w.destroy()
@@ -150,7 +152,6 @@ class control:
     #gtk.main_quit(t)
     self.player.quit()
     self.running = False
-    self.parent.saveFeeds()
     if os.path.exists(self.stateFileLoad):
       restorePath = os.environ.get('HOME') + "/.mokorss/restore.state"
       os.system("alsactl -f "+restorePath+" restore")

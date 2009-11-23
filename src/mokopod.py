@@ -173,7 +173,7 @@ class gui:
     for episode in feed.episodes:
       item = gtk.HBox(False, 5)
       downloadButton = gtk.Button("get")
-      downloadButton.connect('clicked',  lambda t: downloadCallback(feed, episode))
+      downloadButton.connect('clicked',  lambda t: downloadCallback(episode))
       item.pack_start(downloadButton, False, False, 0)
       playButton = gtk.Button("play")
       playButton.connect('clicked',  lambda t: playCallback(episode))
@@ -281,19 +281,37 @@ class mokorss:
         os.mkdir(self.storageRoot)
     except BaseException, err:
       self.gui.showText("failed to create storage root!\n'%s'\n%s\n%s" %  (self.storageRoot, err.__class__.__name__,  err.args))
-
-  def playLatestEpisode(self, t):
-    feed = self.feeds[self.gui.feedCombo.get_active()-1]
-    view = playpod.view(self.gui.w, feed.episodes[0],  feed.name)
-    playpod.control(view, feed.episodes[0], self)
   
   def playEpisode(self,  episode):
     try:
-      view = playpod.view(self.gui.w, episode,  "Playing episode:") #TODO: should pass feed name rather than "playing episode"
+      episode.position = self.getPosition(episode)
+      view = playpod.view(self.gui.w, episode)
       playpod.control(view, episode, self)
     except BaseException, err:
       view.w.destroy()
       self.gui.showText("playEpisode failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+
+  def getPosition(self,  episode):
+    try:
+      positionFile=self.save_path + episode.parentFeed.relativeDownloadPath + episode.filename + '.position'
+      if not os.path.exists(positionFile):
+        return 0
+      else:
+        f = open(positionFile, 'r' )
+        line=f.read()
+        f.close()
+        return int(line)
+    except BaseException, err:
+      self.gui.showText("failed to load playback position!\n%s\n%s\n%s" %  (err.__class__.__name__,  err.args))
+
+  def savePosition(self,  episode,  position):
+    try:
+      positionFile=self.save_path + episode.parentFeed.relativeDownloadPath + episode.filename + '.position'
+      f = open(positionFile, 'w' )
+      f.write(position)
+      f.close()
+    except BaseException, err:
+      self.gui.showText("failed to save playback position!\n%s\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def deleteEpisode(self, episode):
     if self.gui.yesNoDialog("Really delete episode?\n%s" % (episode.title)):
@@ -334,7 +352,7 @@ class mokorss:
     feed = self.feeds[self.gui.feedCombo.get_active()-1]
     self.gui.showEpisodeList(feed, self.downloadEpisode,  self.playEpisode,  self.deleteEpisode)
 
-  def downloadEpisode(self, feed, episode):
+  def downloadEpisode(self, episode):
     waitWindow=self.gui.busyWindow("downloading...")
     try:
       episode.Download(self.save_path)
@@ -342,7 +360,7 @@ class mokorss:
       waitWindow.destroy()
       self.gui.showText("download failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
       return
-    self.saveFeed(feed) #to save the new state of this episode
+    self.saveFeed(episode.parentFeed) #to save the new state of this episode
     waitWindow.destroy()
     self.gui.showText("downloaded")
 
