@@ -434,7 +434,10 @@ class mokorss:
     #load saved data for each feed
     for feedInfo in self.feedInfo.feedInfoList:
       if feedInfo["folder"]: #folder only available after feed parsed for first time as based on feed title
-        self.feeds.append(self.loadFeed(self.save_path + feedInfo["folder"]))
+        feed = self.loadFeed(self.save_path + feedInfo["folder"])
+        if feed==None: #load feed stub instead as no feed data found
+          feed=Feed(feedInfo["url"])
+        self.feeds.append(feed)
       else:
         self.feeds.append(Feed(feedInfo["url"]))
     self.redrawFeedCombo()
@@ -455,13 +458,17 @@ class mokorss:
 
   def loadFeed(self, feedFolder):
     try:
-      f = open(feedFolder + "pickledFeedData", 'r' )
-      feed = pickle.load(f)
-      f.close()
+      feedFile = feedFolder + "pickledFeedData"
+      if not os.path.exists(feedFile): # Does the feed data file exists?
+        return None# nothing to load
+      else:
+        f = open(feedFile, 'r' )
+        feed = pickle.load(f)
+        f.close()
+      return feed
     except BaseException, err:
       self.gui.showText("loadFeed for %s failed!\n%s\n%s" %  (feedFolder, err.__class__.__name__,  err.args))
-      raise
-    return feed
+    return None #failed
   
   def getPodcastFolder(self):
     try:
