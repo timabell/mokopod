@@ -374,7 +374,7 @@ class mokorss:
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
     self.redrawFeedCombo()
     waitWindow.destroy()
-    self.gui.showText("updated")
+    self.gui.showText("updated\n%i new episodes" % feed.countNewest())
 
   def addNewFeeds(self,  t):
     text = self.gui.newfeed_URL.get_text()
