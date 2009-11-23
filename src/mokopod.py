@@ -44,11 +44,13 @@ class gui:
   
   def showFeed(self, feed):
     #called indirectly when item selected in feed list combo box
-    self.feedInfo_label[0].set_label("Name: " + feed.name)
-    self.feedInfo_label[1].set_label("URL: " + feed.url)
     self.listEpisodesButton.set_sensitive(True)
     self.updateFeedButton.set_sensitive(True)
     self.feedInfo_removeb.set_sensitive(True)
+    self.feedInfo_label[1].set_label("URL: " + feed.url)
+    if feed.name==None: #no data to display yet
+      return
+    self.feedInfo_label[0].set_label("Name: " + feed.name)
     if feed.episodes:
       latest = feed.episodes[0]
       self.feedInfo_label[2].set_label("*Latest episode* - %s" % latest.status)
@@ -264,6 +266,7 @@ class mokorss:
       self.gui.showText("IntializeDownloadLocation failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def __init__(self, gui):
+    self.feeds = []
     self.storageRoot = os.environ.get('HOME') + "/.mokorss/"
     try:
       if not os.path.exists(self.storageRoot):
@@ -383,8 +386,9 @@ class mokorss:
     self.gui.newfeed_window.destroy()
     for url in text.split(" "): #multiple urls separated by spaces (works for single url too)
       if url!="":
-        self.feeds.append(Feed(url))
-    self.saveFeeds()
+        feed=Feed(url)
+        self.feeds.append(feed)
+    self.saveFeedList()
     self.redrawFeedCombo()
 
   def showFeedInfo(self, cb):
@@ -394,27 +398,55 @@ class mokorss:
       self.gui.clearInfoView()
       return None
     self.currentFeed = active
-    self.gui.showFeed( self.feeds[active] )
+    self.gui.showFeed( self.feeds[active-1] )
     #cb.set_active(0)
-  
-  def saveFeeds(self):
+
+  def saveFeedList(self):
+    self.feedInfo = FeedInfo()
+    for feed in self.feeds:
+      self.feedInfo.feedInfoList.append({"name":feed.name,  "folder":feed.relativeDownloadPath,  "url":feed.url})
     try:
       f = open(self.feedListFile, 'w' )
-      pickle.dump(self.feeds, f)
+      pickle.dump(self.feedInfo, f)
       f.close()
     except BaseException, err:
-      self.gui.showText("saveFeeds failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      self.gui.showText("saveFeedList failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
 
   def loadFeeds(self):
     try:
       if not os.path.exists(self.feedListFile): # Does the file feed list exists?
-        self.feeds = []
+        return # nothing to load
       else:
         f = open(self.feedListFile, 'r' )
-        self.feeds = pickle.load(f)
+        self.feedInfo = pickle.load(f)
         f.close()
     except BaseException, err:
-      self.gui.showText("loadFeeds failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+      self.gui.showText("loadFeedList failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
+    #load saved data for each feed
+    for feedInfo in self.feedInfo.feedInfoList:
+      if feedInfo["folder"]: #folder only available after feed parsed for first time as based on feed title
+        self.feeds.append(self.loadFeed(feedInfo["folder"]))
+      else:
+        self.feeds.append(Feed(feedInfo["url"]))
+    self.redrawFeedCombo()
+
+  def saveFeed(self,  feed):
+    #save feed state to file in feed folder
+    try:
+      f = open(feed.relativeDownloadPath + 'pickledFeedData', 'w' )
+      pickle.dump(feed, f)
+      f.close()
+    except BaseException, err:
+      self.gui.showText("saveFeed for %s failed!\n%s\n%s" %  (feed.name, err.__class__.__name__,  err.args))
+
+  def loadFeed(self, feedFolder):
+    try:
+      f = open(feedFolder + "pickledFeedData", 'r' )
+      feed = pickle.load(f)
+      f.close()
+    except BaseException, err:
+      self.gui.showText("loadFeed for %s failed!\n%s\n%s" %  (feedFolder, err.__class__.__name__,  err.args))
+    return feed
   
   def getPodcastFolder(self):
     try:
@@ -447,9 +479,12 @@ class mokorss:
     number = len(self.gui.feedCombo.get_model())
     for i in range(1,number): #remove all but title entry
       self.gui.feedCombo.remove_text(1)
-    for feed in self.feeds[1::]: #add each feed
+    for feed in self.feeds: #add each feed
       #name, total (excluding deleted), newest, downloaded
-      self.gui.feedCombo.append_text("%s||%inew|%igot|%itotal)" % (feed.name,  feed.countNewest(),  feed.countDownloaded(), feed.count()))
+      if feed.name:
+        self.gui.feedCombo.append_text("%s||%inew|%igot|%itotal)" % (feed.name,  feed.countNewest(),  feed.countDownloaded(), feed.count()))
+      else: #no data for feed yet
+        self.gui.feedCombo.append_text(feed.url)
     self.gui.feedCombo.set_active(selected)
   
   def net_getFeedName(self, url):
@@ -461,6 +496,8 @@ class Feed:
     self.url = url
     self.name = url # temporary name till first update
     self.episodes=[]
+    self.relativeDownloadPath=None
+    self.name=None
 
   def count(self):
     newest = filter(lambda episode: episode.status!="deleted",  self.episodes)
@@ -532,7 +569,12 @@ class Episode:
     self.file = folder+self.filename
     urllib.urlretrieve(self.downloadUrl, self.file)
     self.status = "ready"
-    self.position = 0 #where the user stopped playing this episode
+
+class FeedInfo:
+  #minimum info needed to rest of feed info from disk
+  def __init__(self):
+    self.feedInfoList = []
+  
 
 if __name__ == "__main__":
   #os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
