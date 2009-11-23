@@ -173,16 +173,16 @@ class gui:
     for episode in feed.episodes:
       item = gtk.HBox(False, 5)
       downloadButton = gtk.Button("get")
-      downloadButton.connect('clicked',  lambda t: downloadCallback(episode))
+      downloadButton.connect('clicked',  lambda t,  e=episode: downloadCallback(e))
       item.pack_start(downloadButton, False, False, 0)
       playButton = gtk.Button("play")
-      playButton.connect('clicked',  lambda t: playCallback(episode))
+      playButton.connect('clicked',  lambda t,  e=episode: playCallback(e))
       item.pack_start(playButton, False, False, 0)
       text = gtk.Label(episode.status + ", " + episode.title)
       text.set_alignment(0, 0.5)
       item.pack_start(text, False, True, 0)
       deleteButton = gtk.Button("delete")
-      deleteButton.connect('clicked',  lambda t: deleteCallback(episode))
+      deleteButton.connect('clicked',  lambda t,  e=episode: deleteCallback(e))
       item.pack_start(deleteButton, False, False, 5)
       list.add(item)
     listScroller = gtk.ScrolledWindow() 
@@ -323,10 +323,6 @@ class mokorss:
         return
       episode.status="deleted"
       self.saveFeeds() #to save the new state of this episode
-
-  def getLatestEpisode(self, t):
-    self.downloadEpisode(self.feeds[self.currentFeed].episodes[0])
-    self.gui.showFeed() #update displayed feed info, and enable play button
 
   def removeCurrentFeed(self, t):
     if self.gui.yesNoDialog("Do you really want to remove\n%s?" % (self.feeds[self.currentFeed].name)):
