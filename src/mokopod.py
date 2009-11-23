@@ -37,7 +37,7 @@ class gui:
   
   def get_active_text(self, combobox):
     model = combobox.get_model()
-    active = combobox.get_active()
+    active = combobox.get_active()-1
     if active < 1:
       return None
     return model[active][0]
@@ -173,16 +173,16 @@ class gui:
     for episode in feed.episodes:
       item = gtk.HBox(False, 5)
       downloadButton = gtk.Button("get")
-      downloadButton.connect('clicked',  lambda t,  selectedEpisode=episode: downloadCallback(selectedEpisode))
+      downloadButton.connect('clicked',  lambda t: downloadCallback(feed, episode))
       item.pack_start(downloadButton, False, False, 0)
       playButton = gtk.Button("play")
-      playButton.connect('clicked',  lambda t,  selectedEpisode=episode: playCallback(selectedEpisode))
+      playButton.connect('clicked',  lambda t: playCallback(episode))
       item.pack_start(playButton, False, False, 0)
       text = gtk.Label(episode.status + ", " + episode.title)
       text.set_alignment(0, 0.5)
       item.pack_start(text, False, True, 0)
       deleteButton = gtk.Button("delete")
-      deleteButton.connect('clicked',  lambda t,  selectedEpisode=episode: deleteCallback(selectedEpisode))
+      deleteButton.connect('clicked',  lambda t: deleteCallback(episode))
       item.pack_start(deleteButton, False, False, 5)
       list.add(item)
     listScroller = gtk.ScrolledWindow() 
@@ -257,27 +257,16 @@ class gui:
 
 
 class mokorss:
-  def IntializeDownloadLocation(self):
-    self.save_path = self.getPodcastFolder()
-    try:
-      if not os.path.exists(self.save_path):
-        os.mkdir(self.save_path)
-    except BaseException, err:
-      self.gui.showText("IntializeDownloadLocation failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
-
   def __init__(self, gui):
     self.feeds = []
     self.storageRoot = os.environ.get('HOME') + "/.mokorss/"
-    try:
-      if not os.path.exists(self.storageRoot):
-        os.mkdir(self.storageRoot)
-    except BaseException, err:
-      self.gui.showText("failed to create storage root!\n'%s'\n%s\n%s" %  (self.storageRoot, err.__class__.__name__,  err.args))
     self.feedListFile = self.storageRoot + "feedlist"
     self.downloadFolderFile = self.storageRoot + "downloadfolder"
+    self.initStorageRoot()
+    self.save_path = self.getPodcastFolder()
     self.gui = gui
     self.loadFeeds()
-    self.redrawFeedCombo()
+    #ui events
     gui.feedCombo.connect("changed", self.showFeedInfo)
     gui.newFeedButton.connect('clicked', self.newFeedWindow)
     gui.configureButton.connect('clicked', self.setFolderToSaveIn)
@@ -285,9 +274,16 @@ class mokorss:
     gui.feedInfo_removeb.connect('clicked', self.removeCurrentFeed)
     gui.listEpisodesButton.connect('clicked', self.newEpisodeListWindow)
     gui.updateFeedButton.connect('clicked', self.updateFeed)
-  
+
+  def initStorageRoot(self):
+    try:
+      if not os.path.exists(self.storageRoot):
+        os.mkdir(self.storageRoot)
+    except BaseException, err:
+      self.gui.showText("failed to create storage root!\n'%s'\n%s\n%s" %  (self.storageRoot, err.__class__.__name__,  err.args))
+
   def playLatestEpisode(self, t):
-    feed = self.feeds[self.gui.feedCombo.get_active()]
+    feed = self.feeds[self.gui.feedCombo.get_active()-1]
     view = playpod.view(self.gui.w, feed.episodes[0],  feed.name)
     playpod.control(view, feed.episodes[0], self)
   
@@ -335,19 +331,18 @@ class mokorss:
     self.gui.newfeed_ok_button.connect('clicked',self.addNewFeeds)
 
   def newEpisodeListWindow(self, t):
-    feed = self.feeds[self.gui.feedCombo.get_active()]
+    feed = self.feeds[self.gui.feedCombo.get_active()-1]
     self.gui.showEpisodeList(feed, self.downloadEpisode,  self.playEpisode,  self.deleteEpisode)
 
-  def downloadEpisode(self, episode):
+  def downloadEpisode(self, feed, episode):
     waitWindow=self.gui.busyWindow("downloading...")
-    self.IntializeDownloadLocation()
     try:
       episode.Download(self.save_path)
     except BaseException, err:
       waitWindow.destroy()
       self.gui.showText("download failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
       return
-    self.saveFeeds() #to save the new state of this episode
+    self.saveFeed(feed) #to save the new state of this episode
     waitWindow.destroy()
     self.gui.showText("downloaded")
 
@@ -368,14 +363,15 @@ class mokorss:
 
   def updateFeed(self, t):
     waitWindow=self.gui.busyWindow("updating...")
-    feed = self.feeds[self.gui.feedCombo.get_active()]
+    feed = self.feeds[self.gui.feedCombo.get_active()-1]
     try:
       feed.Update()
     except BaseException, err:
       waitWindow.destroy()
       self.gui.showText("update failed!\n%s\n%s" %  (err.__class__.__name__,  err.args))
       return
-    self.saveFeeds()
+    self.saveFeedList()  #update saved feed name
+    self.saveFeed(feed)
     self.gui.showFeed(self.feeds[self.currentFeed]) #update displayed feed info
     self.redrawFeedCombo()
     waitWindow.destroy()
@@ -393,13 +389,12 @@ class mokorss:
 
   def showFeedInfo(self, cb):
     #fired when item selected in feed list combo box
-    active = cb.get_active()
-    if active < 1:
+    active = cb.get_active()-1
+    if active < 0:
       self.gui.clearInfoView()
       return None
     self.currentFeed = active
-    self.gui.showFeed( self.feeds[active-1] )
-    #cb.set_active(0)
+    self.gui.showFeed( self.feeds[active] )
 
   def saveFeedList(self):
     self.feedInfo = FeedInfo()
@@ -425,15 +420,20 @@ class mokorss:
     #load saved data for each feed
     for feedInfo in self.feedInfo.feedInfoList:
       if feedInfo["folder"]: #folder only available after feed parsed for first time as based on feed title
-        self.feeds.append(self.loadFeed(feedInfo["folder"]))
+        self.feeds.append(self.loadFeed(self.save_path + feedInfo["folder"]))
       else:
         self.feeds.append(Feed(feedInfo["url"]))
     self.redrawFeedCombo()
 
   def saveFeed(self,  feed):
     #save feed state to file in feed folder
+    feedPath = self.save_path + feed.relativeDownloadPath
     try:
-      f = open(feed.relativeDownloadPath + 'pickledFeedData', 'w' )
+      if not os.path.exists(self.save_path):
+        os.mkdir(self.save_path)
+      if not os.path.exists(feedPath):
+        os.mkdir(feedPath)
+      f = open(feedPath + 'pickledFeedData', 'w' )
       pickle.dump(feed, f)
       f.close()
     except BaseException, err:
@@ -446,6 +446,7 @@ class mokorss:
       f.close()
     except BaseException, err:
       self.gui.showText("loadFeed for %s failed!\n%s\n%s" %  (feedFolder, err.__class__.__name__,  err.args))
+      raise
     return feed
   
   def getPodcastFolder(self):
