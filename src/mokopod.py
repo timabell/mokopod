@@ -290,7 +290,7 @@ class mokorss:
   
   def playEpisode(self,  episode):
     try:
-      view = playpod.view(self.gui.w, episode,  "fixme - feed title here")
+      view = playpod.view(self.gui.w, episode,  "Playing episode:") #TODO: should pass feed name rather than "playing episode"
       playpod.control(view, episode, self)
     except BaseException, err:
       view.w.destroy()
