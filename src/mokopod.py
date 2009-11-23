@@ -197,7 +197,7 @@ class gui:
 
   def __init__(self):
     self.w = gtk.Window()
-    self.w.set_title("Moko do the RSS")
+    self.w.set_title("Mokopod")
     self.w.connect("destroy", gtk.main_quit) # Makes gtk stop when the window is closed
     self.frontPageVBox = self.createFrontPage()
     self.showFrontPage(None)
