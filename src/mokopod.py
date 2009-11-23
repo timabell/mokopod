@@ -212,39 +212,41 @@ class gui:
 
   def createFrontPage(self):
     # Main page
-    mainvbox = gtk.VBox(False, 10)
+    mainvbox = gtk.VBox(False, 5)
     # Add topbar with buttons
-    hbox = gtk.HBox(False,10)
+    globalButtonsHBox = gtk.HBox(True, 5)
     self.configureButton = gtk.Button("Settings...")
-    hbox.add(self.configureButton)
+    globalButtonsHBox.add(self.configureButton)
     self.updateAllButton = gtk.Button("Update all")
-    hbox.add(self.updateAllButton)
+    globalButtonsHBox.add(self.updateAllButton)
     self.newFeedButton = gtk.Button("Add...")
-    hbox.add(self.newFeedButton)
-    mainvbox.pack_start(hbox, False, False, 0)
+    globalButtonsHBox.add(self.newFeedButton)
+    mainvbox.pack_start(globalButtonsHBox, True, True, 0)
     # Add list of current feeds
     self.feedCombo = gtk.combo_box_new_text()
     self.feedCombo.append_text("List of feeds:")
     self.feedCombo.set_active(0)
-    mainvbox.pack_start(self.feedCombo, False, False, 0)
+    mainvbox.pack_start(self.feedCombo, True, True, 0)
     #feed info
-    vbox = gtk.VBox(False, 1)
+    feedInfoVBox = gtk.VBox(False, 1)
     self.feedInfo_label = []
     for i in range(0,6):
       self.feedInfo_label.append(gtk.Label(""))
-      vbox.pack_start(self.feedInfo_label[i], False, False, 0)
-    hbox = gtk.HBox(True,  5)
+      feedInfoVBox.pack_start(self.feedInfo_label[i], False, False, 0)
+    mainvbox.pack_start(feedInfoVBox, False, False, 0)
+    #feed buttons
+    feedButtonsHBox = gtk.HBox(True,  5)
     self.updateFeedButton = gtk.Button("Update feed")
     self.updateFeedButton.set_sensitive(False)
-    hbox.add(self.updateFeedButton)
+    feedButtonsHBox.add(self.updateFeedButton)
     self.listEpisodesButton = gtk.Button("Episodes...")
     self.listEpisodesButton.set_sensitive(False)
-    hbox.add(self.listEpisodesButton)
-    vbox.pack_start(hbox, True, True, 0)
+    feedButtonsHBox.add(self.listEpisodesButton)
+    mainvbox.pack_start(feedButtonsHBox, True, True, 0)
+    #remove feed button
     self.feedInfo_removeb = gtk.Button("Remove feed and files")
     self.feedInfo_removeb.set_sensitive(False)
-    vbox.pack_end(self.feedInfo_removeb, False, False, 0)
-    mainvbox.add(vbox)
+    mainvbox.pack_end(self.feedInfo_removeb, False, False, 0)
     return mainvbox
 
   def main(self):
