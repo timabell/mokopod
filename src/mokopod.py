@@ -440,12 +440,14 @@ class mokorss:
       self.gui.showText("failed to save storage config!\n'%s'\n%s\n%s" %  (self.downloadFolderFile, err.__class__.__name__,  err.args))
 
   def redrawFeedCombo(self):
+    #remember which was already selected
     selected=self.gui.feedCombo.get_active()
     number = len(self.gui.feedCombo.get_model())
-    for i in range(1,number):
+    for i in range(1,number): #remove all but title entry
       self.gui.feedCombo.remove_text(1)
-    for feed in self.feeds[1::]:
-      self.gui.feedCombo.append_text(feed.name)
+    for feed in self.feeds[1::]: #add each feed
+      #name, total (excluding deleted), newest, downloaded
+      self.gui.feedCombo.append_text("%s||%inew|%igot|%itotal)" % (feed.name,  feed.countNewest(),  feed.countDownloaded(), feed.count()))
     self.gui.feedCombo.set_active(selected)
   
   def net_getFeedName(self, url):
@@ -457,6 +459,18 @@ class Feed:
     self.url = url
     self.name = url # temporary name till first update
     self.episodes=[]
+
+  def count(self):
+    newest = filter(lambda episode: episode.status!="deleted",  self.episodes)
+    return len(newest)
+
+  def countNewest(self):
+    newest = filter(lambda episode: episode.status=="newest",  self.episodes)
+    return len(newest)
+
+  def countDownloaded(self):
+    newest = filter(lambda episode: episode.status=="ready",  self.episodes)
+    return len(newest)
 
   def Update(self):
     parsedFeed = self.Parse(self.url)
