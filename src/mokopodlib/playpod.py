@@ -100,7 +100,8 @@ class control:
     self.player = pymplayer.MPlayer()
     self.player.args = [episode.file]
     self.player.stdout.attach(handle_data)
-    self.player.start()
+    if self.player.start()==False:
+      raise Exception("mplayer failed to start. :-(")
     self.player.command('volume', volume, 1)
     self.player.command('seek', episode.position, 2)
     signal.signal(signal.SIGTERM, lambda s, f: player.quit())
