@@ -369,7 +369,7 @@ class mokorss:
     lastUpdateResult=""
     for feed in self.feeds:
       progress+=1
-      waitWindow=self.gui.busyWindow("%i of %i, %i failures\n%snow updating:\n%s..." % (progress, total, len(failed), lastUpdateResult, feed.name))
+      waitWindow=self.gui.busyWindow("updating %s...\nfeed %i of %i. %i failed feeds.\n%s\n%i total new episodes" % (feed.name, progress, total, len(failed), lastUpdateResult, episodes))
       try:
         feed.Update()
         succeeded+=1
@@ -377,16 +377,18 @@ class mokorss:
       except BaseException, err:
         waitWindow.destroy()
         failed.append("%s error:\n%s\n%s" %  (feed.name, err.__class__.__name__,  err.args))
+        lastUpdateResult="Previous feed failed:\n%s" % feed.name
         continue
       self.saveFeedList()  #update saved feed name
       self.saveFeed(feed)
       waitWindow.destroy()
-      lastUpdateResult="%s updated\n%i new episodes, %i total\n" % (feed.name, feed.countNewest(), episodes)
+      lastUpdateResult="Previous feed:\n%s\n%i new episodes" % (feed.name, feed.countNewest())
     self.redrawFeedCombo()
+    finalStatus="%i feeds updated\n%i new episodes" % (succeeded, episodes)
     if len(failed):
-      self.gui.showText("%i failures:\n%s" % (len(failed), '\n'.join(failed)))
+      self.gui.showText("%s\n%i failures:\n%s" % (finalStatus, len(failed), '\n'.join(failed)))
     else:
-      self.gui.showText("updated")
+      self.gui.showText(finalStatus)
 
   def updateFeed(self, t):
     waitWindow=self.gui.busyWindow("updating...")
