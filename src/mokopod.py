@@ -555,8 +555,9 @@ class Feed:
     for entry in parsedFeed.entries:
       existing = self.FindEpisodeById(entry.id)
       if existing:
-        existing.status="new" #no longer newest item
-        return #ignore already seen item
+        if existing.status=="newest":
+          existing.status="new" #no longer newest item
+        continue #ignore already seen item
       episode = Episode()
       episode.id = entry.id #unique id for this episode
       episode.title = entry.title
