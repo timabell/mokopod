@@ -519,7 +519,7 @@ class mokorss:
     for feed in self.feeds: #add each feed
       #name, total (excluding deleted), newest, downloaded
       if feed.name:
-        self.gui.feedCombo.append_text("%s||%inew|%igot|%itotal)" % (feed.name,  feed.countNewest(),  feed.countDownloaded(), feed.count()))
+        self.gui.feedCombo.append_text("%s||%inew|%igot|%itotal)" % (feed.name[:26],  feed.countNewest(),  feed.countDownloaded(), feed.count()))
       else: #no data for feed yet
         self.gui.feedCombo.append_text(feed.url)
     self.gui.feedCombo.set_active(selected)
