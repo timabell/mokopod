@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.2.dtd">
-<!-- eric4 project file for project mokopod -->
-<!-- Saved: 2009-11-19, 06:04:08 -->
+<!-- eric4 project file for project podpooch -->
+<!-- Saved: 2009-12-27, 18:15:10 -->
 <!-- Copyright (C) 2009 ,  -->
 <Project version="4.2">
   <ProgLanguage mixed="0">Python</ProgLanguage>
@@ -13,41 +13,41 @@
   <Sources>
     <Source>
       <Dir>src</Dir>
-      <Name>mokopod.py</Name>
+      <Name>podpooch.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>feedparser.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>playpod.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>cgi.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>asynchat.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>asyncore.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>__init__.py</Name>
     </Source>
     <Source>
       <Dir>src</Dir>
-      <Dir>mokopodlib</Dir>
+      <Dir>podpoochlib</Dir>
       <Name>pymplayer.py</Name>
     </Source>
   </Sources>
