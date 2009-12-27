@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=MokoPod
+Name=Pod Pooch
 Comment=Retrieve an listen to podcasts
 Encoding=UTF-8
-Version=0.1
-Exec=mokopod
+Version=0.2
+Exec=podpooch
 Icon=
 Terminal=false
 Type=Application
