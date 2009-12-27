@@ -24,8 +24,8 @@ from threading import Thread
 
 sys.path.append('/usr/lib/site-python')
 
-from mokopodlib import feedparser
-from mokopodlib import playpod
+from podpoochlib import feedparser
+from podpoochlib import playpod
 
 # Requirements on Openmoko: (not complete)
 # python-html, python-pickle, python-netclient, mplayer, python-pygtk
@@ -197,7 +197,7 @@ class gui:
 
   def __init__(self):
     self.w = gtk.Window()
-    self.w.set_title("Mokopod")
+    self.w.set_title("Pod Pooch")
     self.w.connect("destroy", gtk.main_quit) # Makes gtk stop when the window is closed
     self.frontPageVBox = self.createFrontPage()
     self.showFrontPage(None)

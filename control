@@ -1,10 +1,10 @@
-Package: mokopod
+Package: podpooch
 Version: 0.1.5.1
 Description: Retrieve and listen to podcasts.
 Section: openmoko/audio
 Maintainer: Esben Damgaard <ebbe@hvemder.dk>
 Architecture: armv4t
-OE: mokopod
+OE: podpooch
 Homepage: http://...
 Priority: optional
 Tags: group::audio

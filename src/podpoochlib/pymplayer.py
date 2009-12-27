@@ -42,8 +42,8 @@ import sys
 sys.path.append('/usr/lib/site-python')
 
 import socket
-from mokopodlib import asyncore
-from mokopodlib import asynchat
+from podpoochlib import asyncore
+from podpoochlib import asynchat
 from select import select
 from subprocess import Popen, PIPE, STDOUT
 
@@ -80,7 +80,7 @@ class MPlayer(object):
 
     """
 
-    executable = 'mokopod_mplayer'
+    executable = 'podpooch_mplayer'
 
     def __init__(self, args=()):
         self.args = args
