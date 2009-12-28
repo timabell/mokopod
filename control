@@ -1,5 +1,5 @@
 Package: podpooch
-Version: 0.2.0.1
+Version: 0.2.0.2
 Description: Retrieve and listen to podcasts.
 Section: openmoko/audio
 Maintainer: Tim Abell <tim@timwise.co.uk>
