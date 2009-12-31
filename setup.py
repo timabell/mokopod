@@ -1,8 +1,8 @@
 from distutils.core import setup
 setup (name = "podpooch",
-	version = "0.2.0.5",
+	version = "0.2.0.6",
 	package_dir = {'': 'src'},
-	py_modules = ['podpooch'],
+	scripts = ['src/podpooch'],
 	packages = ["podpoochlib"],
 	url = "http://wiki.openmoko.org/wiki/PodPooch",
 	author = "Tim Abell et al",
