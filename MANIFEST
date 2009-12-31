@@ -1,9 +1,0 @@
-setup.py
-src/podpooch.py
-src/podpoochlib/__init__.py
-src/podpoochlib/asynchat.py
-src/podpoochlib/asyncore.py
-src/podpoochlib/cgi.py
-src/podpoochlib/feedparser.py
-src/podpoochlib/playpod.py
-src/podpoochlib/pymplayer.py

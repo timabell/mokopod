@@ -1,0 +1,3 @@
+recursive-include *.py
+include podpooch.desktop
+include podpooch.png
