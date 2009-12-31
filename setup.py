@@ -9,8 +9,8 @@ setup (name = "podpooch",
 	author_email = "tim@timwise.co.uk",
 	maintainer = "Tim Abell",
 	maintainer_email = "tim@timwise.co.uk",
-	data_files=[('pixmaps', ['podpooch.png']),
-		('applications', ['podpooch.desktop'])
+	data_files=[('share/pixmaps', ['podpooch.png']),
+		('share/applications', ['podpooch.desktop'])
 		]
 	)
 
