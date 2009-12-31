@@ -15,6 +15,7 @@ inherit autotools
 
 PV = "0.2.0.6"
 FILES_${PN} += "${datadir}/podpooch.desktop  ${datadir}/src ${datadir}/podpooch.png"
+FILES_${PN} += "${libdir}"
 
 # http://svn.nslu2-linux.org/svnroot/slugos/releases/slugos-3.10-beta/openembedded/packages/rdiff-backup/rdiff-backup.inc
 
