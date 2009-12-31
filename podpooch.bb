@@ -13,7 +13,7 @@ SRC_URI = "file:///home/tim/projects/openmoko/mokopod.git/dist/podpooch-0.2.0.6.
 DEPENDS = "python"
 inherit distutils
 
-PV = "0.2.0.6"
+PV = "0.2.0.6" #todo: remove this line, and rename bb file to podpooch_0.2.0.6.bb
 FILES_${PN} += "${datadir}/podpooch.desktop  ${datadir}/src ${datadir}/podpooch.png"
 FILES_${PN} += "${libdir}"
 
