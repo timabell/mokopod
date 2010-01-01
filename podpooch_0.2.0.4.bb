@@ -8,8 +8,9 @@ SECTION = "x11/applications"
 PRIORITY = "optional"
 LICENSE = "GPLv3"
 
-SRC_URI = "http://download.github.com/timabell-mokopod-0023788.tar.gz"
-#SRC_URI is the 302 redirect target for "http://github.com/timabell/mokopod/tarball/0.2.0.4", (try with wget), bitbake can't cope with redirects it seems
+SRC_URI = "git://github.com/timabell/mokopod.git;protocol=http"
+PV = "0.2.0+gitr${SRCPV}"
+PR = "r0"
 DEPENDS = "python"
 inherit distutils
 
