@@ -9,7 +9,7 @@ mkdir -p opkgfolder/usr/share/pixmaps/
 
 
 # Copy the script
-cp src/podpooch.py opkgfolder/usr/bin/podpooch
+cp src/podpooch opkgfolder/usr/bin/
 cp podpooch_mplayer opkgfolder/usr/bin/
 
 #Copy modules
