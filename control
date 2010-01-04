@@ -1,11 +1,11 @@
 Package: podpooch
-Version: 0.2.0.4
+Version: 0.2.0.5
 Description: Retrieve and listen to podcasts.
 Section: openmoko/audio
 Maintainer: Tim Abell <tim@timwise.co.uk>
 Architecture: armv4t
 OE: podpooch
-Homepage: http://...
+Homepage: http://wiki.openmoko.org/wiki/PodPooch
 Priority: optional
 Tags: group::audio
 Depends: python-html, python-pickle, python-netclient, python-pygtk
