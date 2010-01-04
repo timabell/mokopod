@@ -1,11 +1,10 @@
 [Desktop Entry]
 Name=PodPooch
 Comment=Retrieve an listen to podcasts
-Encoding=UTF-8
-Version=0.2
+Version=0.2.0.5
 Exec=podpooch
 Icon=podpooch
 Terminal=false
 Type=Application
-Categories=Application
+Categories=Application;
 StartupNotify=false
