@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=PodPooch
 Comment=Retrieve an listen to podcasts
-Version=0.2.0.5
+Version=1.0
 Exec=podpooch
 Icon=podpooch
 Terminal=false
