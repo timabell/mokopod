@@ -1,12 +1,13 @@
-# bitbake recipie for podpooch
-HOMEPAGE = "http://wiki.openmoko.org/wiki/PodPooch"
-AUTHOR = "Tim Abell et al"
 DESCRIPTION = "A podcast downloader/player"
-LICENSE = "GPLv3"
-SRC_URI = "http://www.timwise.co.uk/src/podpooch-${PV}.tgz"
+AUTHOR = "Tim Abell et al"
+HOMEPAGE = "http://wiki.openmoko.org/wiki/PodPooch"
 SECTION = "x11/applications"
 PRIORITY = "optional"
+LICENSE = "GPLv3"
 DEPENDS = "python"
-inherit distutils
-FILES_${PN} += "${datadir}"
 
+SRC_URI = "http://www.timwise.co.uk/src/${PN}-${PV}.tgz"
+
+inherit distutils
+
+FILES_${PN} += "${datadir}"
