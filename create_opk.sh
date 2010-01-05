@@ -1,5 +1,11 @@
 #!/bin/sh
 
+release=$1
+if [ -z "$release" ]; then
+	echo "version required"
+	exit 1
+fi
+
 
 # Create dirs
 mkdir -p opkgfolder/usr/bin
@@ -22,6 +28,9 @@ cp podpooch.png opkgfolder/usr/share/pixmaps/
 # Copy control
 mkdir opkgfolder/CONTROL
 cp control opkgfolder/CONTROL
+
+#add version info
+echo "Version: $release" >> opkgfolder/CONTROL/control
 
 fakeroot ./ipkg-build opkgfolder
 
