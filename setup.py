@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup (name = "podpooch",
-	version = "0.2.0.4",
+	version = ##version##,  #version set by gen-src-archive.sh
 	package_dir = {'': 'src'},
 	scripts = ['src/podpooch'],
 	packages = ["podpoochlib"],
