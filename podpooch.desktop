@@ -6,5 +6,5 @@ Exec=podpooch
 Icon=podpooch
 Terminal=false
 Type=Application
-Categories=Application;
+Categories=AudioVideo;Audio;
 StartupNotify=false
