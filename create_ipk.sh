@@ -34,6 +34,7 @@ echo "Version: $release" >> opkgfolder/CONTROL/control
 
 fakeroot ./ipkg-build opkgfolder
 
+md5sum podpooch_${release}_armv4t.ipk > podpooch_${release}_armv4t.ipk.md5
 
 # Clean
 rm -rf opkgfolder
