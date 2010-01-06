@@ -8,7 +8,7 @@ else
 	git archive --prefix podpooch-$release/ $release > podpooch-$release.tar
 	mkdir fixup-tmp
 	tar -C fixup-tmp -xf podpooch-$release.tar podpooch-$release/setup.py
-	sed -i s/##version##/$release/ fixup-tmp/podpooch-$release/setup.py
+	sed -i s/##version##/\"$release\"/ fixup-tmp/podpooch-$release/setup.py
 	tar --delete -f podpooch-$release.tar podpooch-$release/setup.py
 	tar -C fixup-tmp -uf podpooch-$release.tar podpooch-$release/setup.py
 	rm -rf fixup-tmp
